@@ -1,0 +1,25 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>signUp</ion-title>
+  </ion-toolbar>
+  <ion-button [routerLink]="['/login']">Go Back</ion-button>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-input [(ngModel)]="username" name="username" placeholder="Usuario"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-input [(ngModel)]="password" name="password" type="password" placeholder="Contraseña"></ion-input>
+  </ion-item>
+    <ion-item>
+      <ion-input [(ngModel)]="confirmPassword" name="confirmPassword" type="password" placeholder="Confirmar Contraseña"></ion-input>
+  </ion-item>
+    <ion-item>
+    <ion-input [(ngModel)]="name" name="name" placeholder="Nombre"></ion-input>
+  </ion-item>
+    <ion-item>
+    <ion-input [(ngModel)]="email" name="email" placeholder="Email"></ion-input>
+  </ion-item>
+  <ion-button type="button" (click)="register()">Registrarse</ion-button>
+</ion-content>

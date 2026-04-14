@@ -1,0 +1,19 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Mis Tareas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let task of tasks">
+      <ion-label [class.completed]="task.completed">{{task.title }}</ion-label>
+      <ion-checkbox slot="start" [(ngModel)]="task.completed" (ionChange)="toggleTask(task)"></ion-checkbox>
+      <ion-button color="danger" fill="clear" (click)="deleteTask(task.id)"> <ion-icon name="trash"></ion-icon></ion-button>
+    </ion-item>
+  </ion-list>
+  <ion-item>
+    <ion-input [(ngModel)]="newTaskTitle" placeholder="Nueva tarea"></ion-input>
+    <ion-button (click)="addTask()">Añadir</ion-button>
+  </ion-item>
+</ion-content>

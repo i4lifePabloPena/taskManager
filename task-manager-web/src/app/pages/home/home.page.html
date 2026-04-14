@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ isAdmin ? 'Todas las Tareas' : 'Mis Tareas' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-badge *ngIf="isAdmin" color="warning">Admin</ion-badge>
+      <ion-button (click)="logout()">Cerrar sesión</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-button [routerLink]="['/tareas']">Ir aTareas</ion-button>
+
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-input [(ngModel)]="newTaskTitle" name="newTaskTitle" placeholder="Nueva tarea"></ion-input>
+    <ion-button type="button" (click)="addTask()">Añadir</ion-button>
+  </ion-item>
+  <ion-list>
+    <ion-item *ngFor="let task of tasks">
+      <ion-label [color]="colorTask(task)"> {{ task.title }} </ion-label>
+      <ion-button color="tertiary" slot="end" (click)="toggleTask(task)"> <ion-icon name="play-skip-forward-outline"></ion-icon></ion-button>
+      <ion-button color="danger" fill="clear" (click)="deleteTask(task)"> <ion-icon name="trash"> </ion-icon> </ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>
