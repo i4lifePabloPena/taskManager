@@ -8,8 +8,8 @@ const SECRET_KEY = 'DYKL+WK+SjXTEHj6RKLMsowPXqvqkdZZEW0gooPShXI='; // Cambiar po
 // Registro de usuario
 router.post('/register', async (req, res) => {
     try {
-        const { username, password, admin, name, email } = req.body;
-        const user = new User({ username, password, admin, name, email, createdAt: new Date()});
+        const { username, password, role, name, email } = req.body;
+        const user = new User({ username, password, role, name, email, createdAt: new Date()});
         await user.save();
         res.status(201).json({ message: 'Usuario creado' });
     } catch (error) {
