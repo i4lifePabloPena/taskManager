@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TaskService, Task } from '../../services/task.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { IonChip } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-home',
@@ -11,7 +12,6 @@ import { AuthService } from 'src/app/services/auth.service';
 export class HomePage implements OnInit {
   tasks: Task[] = [];
   newTaskTitle: string = '';
-  isAdmin: boolean = false;
 
   constructor(
     private taskService: TaskService,
@@ -23,65 +23,32 @@ export class HomePage implements OnInit {
   }
 
   ngOnInit() {
-    this.authService.getUserRole().subscribe((role) => {
-      this.isAdmin = role === 'admin';
-    });
-    this.loadTasks();
+    this.loadTasks(-1);
   }
 
-  loadTasks() {
-    this.taskService.getTasks().subscribe({
-      next: (tasks) => (this.tasks = tasks),
-      error: (err) => {
-        if (err.status === 403) {
-          alert('No tienes permiso para acceder a estas tareas');
-        } else {
-          alert('Error al cargar tareas: ' + err.error?.error);
-        }
-      },
-    });
+  loadTasks(n: number) {
+    if (n == -1) {
+    }
+    this.taskService.getTasks(n).subscribe((tasks) => (this.tasks = tasks));
   }
 
   addTask() {
     if (!this.newTaskTitle.trim()) return;
-    this.taskService.addTask(this.newTaskTitle).subscribe({
-      next: (task) => {
-        this.tasks.push(task);
-        this.newTaskTitle = '';
-      },
-      error: (err) => {
-        alert('Error al crear tarea: ' + err.error?.error);
-      },
+    this.taskService.addTask(this.newTaskTitle).subscribe((task) => {
+      this.tasks.push(task);
+      this.newTaskTitle = '';
     });
   }
 
   toggleTask(task: Task) {
-    this.taskService.updateTask(task._id!).subscribe({
-      next: (updatedTask) => {
-        task.status = updatedTask.status;
-      },
-      error: (err) => {
-        if (err.status === 403) {
-          alert('No autorizado: no puedes modificar esta tarea');
-        } else {
-          alert('Error al actualizar tarea: ' + err.error?.error);
-        }
-      },
+    this.taskService.updateTask(task._id!).subscribe((updatedTask) => {
+      task.status = updatedTask.status;
     });
   }
 
   deleteTask(task: Task) {
-    this.taskService.deleteTask(task._id!).subscribe({
-      next: () => {
-        this.tasks = this.tasks.filter((t) => t._id !== task._id);
-      },
-      error: (err) => {
-        if (err.status === 403) {
-          alert('No autorizado: no puedes eliminar esta tarea');
-        } else {
-          alert('Error al eliminar tarea: ' + err.error?.error);
-        }
-      },
+    this.taskService.deleteTask(task._id!).subscribe(() => {
+      this.tasks = this.tasks.filter((t) => t._id !== task._id);
     });
   }
 

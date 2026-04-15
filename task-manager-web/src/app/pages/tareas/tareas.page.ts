@@ -14,7 +14,7 @@ export class TareasPage implements OnInit {
     this.loadTasks();
   }
   loadTasks() {
-    this.taskService.getTasks().subscribe((tasks) => {
+    this.taskService.getTasks(0).subscribe((tasks) => {
       this.tasks = tasks;
     });
   }

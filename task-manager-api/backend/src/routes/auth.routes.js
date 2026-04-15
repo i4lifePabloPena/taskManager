@@ -22,10 +22,10 @@ router.post('/login', async (req, res) => {
         const { username, password } = req.body;
         const user = await User.findOne({ username });
         if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(401).json({ error: 'Credenciales incorrectas' });
+            return res.status(401).json({ error: 'Credencialesincorrectas' });
         }
-        const token = jwt.sign({ userId: user._id, admin: user.admin }, SECRET_KEY, { expiresIn: '1h' });
-        res.json({ token, admin: user.admin });
+        const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '1h' });
+        res.json({ token });
     } catch (error) {
         res.status(500).json({ error: 'Error en el servidor' });
     }

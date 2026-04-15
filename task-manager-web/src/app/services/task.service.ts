@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Query } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -15,13 +15,19 @@ export interface Task {
 export class TaskService {
   private apiUrl = environment.apiUrl + '/tasks';
   constructor(private http: HttpClient) {}
-  getTasks(): Observable<Task[]> {
+
+  // Obtener tareas
+  getTasks(status?: number): Observable<Task[]> {
     const headers = new HttpHeaders().set(
       'Authorization',
       `Bearer ${localStorage.getItem('token')}`,
     );
-    return this.http.get<Task[]>(this.apiUrl, { headers });
+    let url = this.apiUrl;
+    url += status !== -1 ? `?status=${status}` : '?status=1&status=2&status=0'; // Si el valor es -1 devuelve la lista completa
+    return this.http.get<Task[]>(url, { headers });
   }
+
+  // Añadir tareas
   addTask(title: string): Observable<Task> {
     const headers = new HttpHeaders().set(
       'Authorization',
@@ -29,14 +35,22 @@ export class TaskService {
     );
     return this.http.post<Task>(this.apiUrl, { title }, { headers });
   }
+
+  // Actualizar tareas
   updateTask(id: string): Observable<Task> {
     const headers = new HttpHeaders().set(
       'Authorization',
       `Bearer ${localStorage.getItem('token')}`,
     );
-    return this.http.put<Task>(`${this.apiUrl}/${id}`, {});
+    return this.http.put<Task>(`${this.apiUrl}/${id}`, {}, { headers });
   }
+
+  // Borrar tareas
   deleteTask(id: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${localStorage.getItem('token')}`,
+    );
+    return this.http.delete(`${this.apiUrl}/${id}`, { headers });
   }
 }
