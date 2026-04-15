@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { TaskService } from '../../services/task.service';
+import { TaskService, Task } from '../../services/task.service';
+
 @Component({
   selector: 'app-tareas',
   templateUrl: './tareas.page.html',
@@ -11,12 +12,10 @@ export class TareasPage implements OnInit {
   newTaskTitle: string = '';
   constructor(private taskService: TaskService) {}
   ngOnInit() {
-    this.loadTasks();
+    this.loadTasks(-1);
   }
-  loadTasks() {
-    this.taskService.getTasks(0).subscribe((tasks) => {
-      this.tasks = tasks;
-    });
+  loadTasks(n: number) {
+    this.taskService.getTasks(n).subscribe((tasks) => (this.tasks = tasks));
   }
   addTask() {
     if (this.newTaskTitle.trim() === '') return;
@@ -32,5 +31,20 @@ export class TareasPage implements OnInit {
     this.taskService.deleteTask(id).subscribe(() => {
       this.tasks = this.tasks.filter((t) => t._id !== id);
     });
+  }
+
+  colorTask(task: Task) {
+    let color: string;
+    switch (task.status) {
+      case 0:
+        color = 'default';
+        break;
+      case 1:
+        color = 'warning';
+        break;
+      default:
+        color = 'success';
+    }
+    return color;
   }
 }

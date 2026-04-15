@@ -4,16 +4,21 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-button [routerLink]="['/home']">Go Back</ion-button>
+
+<ion-content class="ion-padding">
+<ion-chip (click)="loadTasks(-1)">All</ion-chip>
+<ion-chip (click)="loadTasks(0)">Pendientes</ion-chip>
+<ion-chip (click)="loadTasks(1)">En Progreso</ion-chip>
+<ion-chip (click)="loadTasks(2)">Completadas</ion-chip>
   <ion-list>
     <ion-item *ngFor="let task of tasks">
-      <ion-label [class.completed]="task.completed">{{task.title }}</ion-label>
-      <ion-checkbox slot="start" [(ngModel)]="task.completed" (ionChange)="toggleTask(task)"></ion-checkbox>
-      <ion-button color="danger" fill="clear" (click)="deleteTask(task.id)"> <ion-icon name="trash"></ion-icon></ion-button>
+      <ion-img src={{task.url}} alt="PlaceHolder"></ion-img>
+      <ion-label [color]="colorTask(task)"> {{ task.title }} </ion-label>
+      <ion-button color="tertiary" slot="end" (click)="toggleTask(task)"> <ion-icon name="play-skip-forward-outline"></ion-icon></ion-button>
+      <ion-button color="danger" fill="clear" (click)="deleteTask(task)"> <ion-icon name="trash"> </ion-icon> </ion-button>
     </ion-item>
   </ion-list>
-  <ion-item>
-    <ion-input [(ngModel)]="newTaskTitle" placeholder="Nueva tarea"></ion-input>
-    <ion-button (click)="addTask()">Añadir</ion-button>
-  </ion-item>
 </ion-content>
+
+<!-- https://www.muycomputer.com/wp-content/uploads/2026/03/Microslop_2.jpg -->

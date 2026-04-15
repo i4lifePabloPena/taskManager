@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 export class AuthService {
   private apiUrl = 'http://localhost:5000/api';
   private authState = new BehaviorSubject<boolean>(this.hasToken());
+  private userRole = new BehaviorSubject<string>(this.getUserRole());
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -16,17 +17,21 @@ export class AuthService {
   private hasToken(): boolean {
     return !!localStorage.getItem('token');
   }
-  register(
-    username: string,
-    password: string,
-    admin: boolean,
-    name: string,
-    email: string,
-  ) {
+  private getUserRole(): string {
+    const token = localStorage.getItem('token');
+    if (!token) return '';
+    try {
+      const [, payload] = token.split('.');
+      const decoded = JSON.parse(atob(payload));
+      return decoded.role || '';
+    } catch (error) {
+      return '';
+    }
+  }
+  register(username: string, password: string, name: string, email: string) {
     return this.http.post(`${this.apiUrl}/register`, {
       username,
       password,
-      admin,
       name,
       email,
     });
@@ -38,16 +43,21 @@ export class AuthService {
         tap((response) => {
           localStorage.setItem('token', response.token);
           this.authState.next(true);
+          this.userRole.next(this.getUserRole());
         }),
       );
   }
   logout() {
     localStorage.removeItem('token');
     this.authState.next(false);
+    this.userRole.next('');
     this.router.navigate(['/login']);
   }
   isAuthenticated() {
     return this.authState.asObservable();
+  }
+  isAdmin() {
+    return this.userRole.asObservable();
   }
   getToken(): string | null {
     return localStorage.getItem('token');

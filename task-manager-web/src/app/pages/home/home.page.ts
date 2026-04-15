@@ -12,6 +12,7 @@ import { IonChip } from '@ionic/angular/standalone';
 export class HomePage implements OnInit {
   tasks: Task[] = [];
   newTaskTitle: string = '';
+  isAdmin: boolean = false;
 
   constructor(
     private taskService: TaskService,
@@ -19,16 +20,20 @@ export class HomePage implements OnInit {
   ) {}
 
   logout() {
+    this.tasks = [];
+    this.newTaskTitle = '';
+    this.isAdmin = false;
     this.authService.logout();
   }
 
   ngOnInit() {
+    this.authService.isAdmin().subscribe((role) => {
+      this.isAdmin = role == 'admin';
+    });
     this.loadTasks(-1);
   }
 
   loadTasks(n: number) {
-    if (n == -1) {
-    }
     this.taskService.getTasks(n).subscribe((tasks) => (this.tasks = tasks));
   }
 

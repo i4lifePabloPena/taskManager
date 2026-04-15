@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Tareas</ion-title>
+    <ion-title>Tareas <ion-icon *ngIf="isAdmin" name="shield-checkmark" color="success"></ion-icon></ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="logout()">Cerrar sesión</ion-button>
     </ion-buttons>
@@ -11,7 +11,7 @@
 <ion-button [routerLink]="['/tareas']">Ir aTareas</ion-button>
 
 <ion-content class="ion-padding">
-<ion-chip (click)="loadTasks(-1)">All</ion-chip>
+<ion-chip default (click)="loadTasks(-1)">All</ion-chip>
 <ion-chip (click)="loadTasks(0)">Pendientes</ion-chip>
 <ion-chip (click)="loadTasks(1)">En Progreso</ion-chip>
 <ion-chip (click)="loadTasks(2)">Completadas</ion-chip>

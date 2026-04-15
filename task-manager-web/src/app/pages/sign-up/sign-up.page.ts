@@ -24,14 +24,16 @@ export class SignUpPage implements OnInit {
   register() {
     if (this.password == this.confirmPassword) {
       this.authService
-        .register(this.username, this.password, false, this.name, this.email)
+        .register(this.username, this.password, this.name, this.email)
         .subscribe({
           next: () => {
             alert('Registro exitoso. Ahora puedes iniciar sesión.');
             this.router.navigate(['/login']);
           },
           error: (err) => {
-            alert('Error de registro: ' + (err.error?.error || 'Error desconocido'));
+            alert(
+              'Error de registro: ' + (err.error?.error || 'Error desconocido'),
+            );
           },
         });
     } else {
