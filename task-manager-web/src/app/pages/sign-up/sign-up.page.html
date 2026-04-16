@@ -19,7 +19,7 @@
     <ion-input [(ngModel)]="name" name="name" placeholder="Nombre"></ion-input>
   </ion-item>
     <ion-item>
-    <ion-input [(ngModel)]="email" name="email" placeholder="Email"></ion-input>
+    <ion-input type="email" errorText="Invalid email" [(ngModel)]="email" name="email" placeholder="Email"></ion-input>
   </ion-item>
   <ion-button type="button" (click)="register()">Registrarse</ion-button>
 </ion-content>

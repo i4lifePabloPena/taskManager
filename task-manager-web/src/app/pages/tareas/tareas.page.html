@@ -13,12 +13,38 @@
 <ion-chip (click)="loadTasks(2)">Completadas</ion-chip>
   <ion-list>
     <ion-item *ngFor="let task of tasks">
-      <ion-img src={{task.url}} alt="PlaceHolder"></ion-img>
       <ion-label [color]="colorTask(task)"> {{ task.title }} </ion-label>
-      <ion-button color="tertiary" slot="end" (click)="toggleTask(task)"> <ion-icon name="play-skip-forward-outline"></ion-icon></ion-button>
-      <ion-button color="danger" fill="clear" (click)="deleteTask(task)"> <ion-icon name="trash"> </ion-icon> </ion-button>
+      
+
+      <!-- Imagen -->
+      <!-- <ion-img *ngIf="task.url" [src]="task.url" alt="Tarea imagen"></ion-img> -->
+      <img *ngIf="task.url" [src]="task.url" alt="Tarea imagen" width="250px" height="250px">
+      <!-- Input de archivo -->
+      <input 
+        #fileInput
+        type="file" 
+        accept="image/*"
+        style="display: none"
+        (change)="onFileSelected($event, task._id)"
+      />
+      
+      <!-- Botón para subir archivo -->
+      <ion-button 
+        color="primary" 
+        fill="clear" 
+        slot="end"
+        (click)="fileInput.click()"
+        [disabled]="uploadingTaskId === task._id"
+      >
+        <ion-icon name="image-outline"></ion-icon>
+        <span *ngIf="uploadingTaskId === task._id">Subiendo...</span>
+      </ion-button>
+      
+      <!-- status change -->
+      <ion-button color="tertiary" slot="end" (click)="toggleTask(task)"> <ion-icon name="play-skip-forward-outline"></ion-icon> </ion-button>
+    
+      <!-- delete -->
+      <ion-button color="danger" fill="clear" (click)="deleteTask(task._id)"> <ion-icon name="trash"></ion-icon> </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>
-
-<!-- https://www.muycomputer.com/wp-content/uploads/2026/03/Microslop_2.jpg -->

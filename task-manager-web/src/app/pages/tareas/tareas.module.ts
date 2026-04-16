@@ -9,12 +9,7 @@ import { TareasPageRoutingModule } from './tareas-routing.module';
 import { TareasPage } from './tareas.page';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    TareasPageRoutingModule
-  ],
-  declarations: [TareasPage]
+  imports: [CommonModule, FormsModule, IonicModule, TareasPageRoutingModule],
+  declarations: [TareasPage],
 })
 export class TareasPageModule {}
