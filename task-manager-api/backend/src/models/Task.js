@@ -4,6 +4,7 @@ const taskSchema = new mongoose.Schema({
     status: { type: Number, default: 0 },
     url: { type: String, default: '' },
     userId: { type: mongoose.Schema.Types.ObjectId},
+    idTags: {type: mongoose.Schema.Types.ObjectId}
 }, { timestamps: true });
 const Task = mongoose.model('Task', taskSchema);
 module.exports = Task;

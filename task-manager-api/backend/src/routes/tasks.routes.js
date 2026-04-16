@@ -138,4 +138,18 @@ router.delete('/tasks/:id', authMiddleware, async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar la tarea'});
     }
 });
+
+// Agregar tags
+router.put("/task/:id", authMiddleware, async(req, res) => {
+    try{
+        const {id} = req.params;
+        let query = {_id: id};
+        const task = await Task.findOne(query);
+        if (!task) return res.status(404).json({Error: "No existe esa tarea"})
+        await task.save();
+        res.json(task);
+    } catch{
+        res.status(500).json({ Error: "Error al añadir el tag"})
+    }
+});
 module.exports = router;

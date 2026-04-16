@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Mis Tareas</ion-title>
+    <ion-title>Mis Tareas <ion-icon *ngIf="isAdmin" name="shield-checkmark" color="success"></ion-icon> </ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -35,6 +35,7 @@
         slot="end"
         (click)="fileInput.click()"
         [disabled]="uploadingTaskId === task._id"
+        *ngIf="isAdmin"
       >
         <ion-icon name="image-outline"></ion-icon>
         <span *ngIf="uploadingTaskId === task._id">Subiendo...</span>
