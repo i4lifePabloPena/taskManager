@@ -8,8 +8,8 @@ const SECRET_KEY = 'DYKL+WK+SjXTEHj6RKLMsowPXqvqkdZZEW0gooPShXI='; // Cambiar po
 // Registro de usuario
 router.post('/register', async (req, res) => {
     try {
-        const { username, password, admin, name, email } = req.body;
-        const user = new User({ username, password, admin, name, email, createdAt: new Date()});
+        const { username, password, role, name, email } = req.body;
+        const user = new User({ username, password, role, name, email, createdAt: new Date()});
         await user.save();
         res.status(201).json({ message: 'Usuario creado' });
     } catch (error) {
@@ -24,7 +24,7 @@ router.post('/login', async (req, res) => {
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).json({ error: 'Credencialesincorrectas' });
         }
-        const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
         res.json({ token });
     } catch (error) {
         res.status(500).json({ error: 'Error en el servidor' });

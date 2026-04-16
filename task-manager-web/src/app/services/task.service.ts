@@ -8,6 +8,7 @@ export interface Task {
   _id?: string;
   title: string;
   status: number;
+  url?: string;
 }
 @Injectable({
   providedIn: 'root',
@@ -43,6 +44,19 @@ export class TaskService {
       `Bearer ${localStorage.getItem('token')}`,
     );
     return this.http.put<Task>(`${this.apiUrl}/${id}`, {}, { headers });
+  }
+
+  // Subir archivo
+  uploadFile(taskId: string, file: File): Observable<any> {
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${localStorage.getItem('token')}`,
+    );
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`${this.apiUrl}/${taskId}/upload`, formData, {
+      headers,
+    });
   }
 
   // Borrar tareas

@@ -18,7 +18,7 @@ const createAdminUser = async () => {
       password,
       email,
       name,
-      admin: true,
+      role: "admin",
       createdAt: new Date(),
     });
 
