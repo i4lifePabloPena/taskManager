@@ -24,6 +24,9 @@
       <ion-label [color]="colorTask(task)"> {{ task.title }} </ion-label>
       <ion-button color="tertiary" slot="end" (click)="toggleTask(task)"> <ion-icon name="play-skip-forward-outline"></ion-icon></ion-button>
       <ion-button color="danger" fill="clear" (click)="deleteTask(task)"> <ion-icon name="trash"> </ion-icon> </ion-button>
+      <ion-button color="success" fill="clear" (click)="openModal()"> <ion-icon name="pricetags-outline"></ion-icon> </ion-button>
     </ion-item>
   </ion-list>
 </ion-content>
+
+  <ion-button expand="block" (click)="openModal()">Open</ion-button>

@@ -71,4 +71,10 @@ export class HomePage implements OnInit {
     }
     return color;
   }
+
+  // Añadir tags
+
+  openModal() {
+    modal.present();
+  }
 }
