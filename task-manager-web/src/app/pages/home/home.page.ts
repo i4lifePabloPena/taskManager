@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { TaskService, Task } from '../../services/task.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { IonChip } from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -17,6 +18,7 @@ export class HomePage implements OnInit {
   constructor(
     private taskService: TaskService,
     private authService: AuthService,
+    private modalCtrl: ModalController,
   ) {}
 
   logout() {
@@ -73,8 +75,4 @@ export class HomePage implements OnInit {
   }
 
   // Añadir tags
-
-  openModal() {
-    modal.present();
-  }
 }

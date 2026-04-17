@@ -45,18 +45,6 @@ router.get('/tasks', authMiddleware, async (req, res) => {
     }
 });
 
-// Agregar una nueva tarea
-router.post('/tasks',authMiddleware , async (req, res) => {
-    try {
-        const { title } = req.body;
-        if (!title) return res.status(400).json({ error: "El título es obligatorio" });
-        const task = new Task({ title, status: 0, userId: req.userId });
-        await task.save();
-        res.status(201).json(task);
-    } catch (error) {
-        res.status(500).json({ error: 'Error al crear la tarea'});
-    }
-})
 
 // Subir archivo
 router.post('/tasks/:id/upload', authMiddleware, upload.single('file'), async (req, res) => {
@@ -70,8 +58,8 @@ router.post('/tasks/:id/upload', authMiddleware, upload.single('file'), async (r
         if (req.userRole !== 'admin') {
             query.userId = req.userId;
         }
-            
-            const task = await Task.findOne(query);
+        
+        const task = await Task.findOne(query);
         if (!task) return res.status(404).json({ error: "La tarea no existe" });
         
         const fileUrl = `http://localhost:5000/uploads/${req.file.filename}`;
@@ -83,6 +71,19 @@ router.post('/tasks/:id/upload', authMiddleware, upload.single('file'), async (r
         res.status(500).json({ error: error.message || 'Error al subir el archivo' });
     }
 });
+
+// Agregar una nueva tarea
+router.post('/tasks',authMiddleware , async (req, res) => {
+    try {
+        const { title } = req.body;
+        if (!title) return res.status(400).json({ error: "El título es obligatorio" });
+        const task = new Task({ title, status: 0, userId: req.userId});
+        await task.save();
+        res.status(201).json(task);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al crear la tarea'});
+    }
+})
 
 // Marcar una tarea como completada
 router.put('/tasks/:id', authMiddleware, async (req, res) => {
@@ -142,16 +143,17 @@ router.delete('/tasks/:id', authMiddleware, async (req, res) => {
 // Agregar tags 
 // 16 - 04 -26 lo deje aqui
 
-router.put("/task/:id", authMiddleware, async(req, res) => {
+router.put("/tasks/tag/:id", authMiddleware, async(req, res) => {
     try{
         const {id} = req.params;
         let query = {_id: id};
         const task = await Task.findOne(query);
-        task.idTags = req.idTags;
-        if (!task) return res.status(404).json({Error: "No existe esa tarea"})
+        if (!task) return res.status(404).json({ Error: "No existe esa tarea"})
+        const { idTags } = req.body;
+        task.idTags = idTags;
         await task.save();
         res.json(task);
-    } catch{
+    } catch(error) {
         res.status(500).json({ Error: "Error al añadir el tag"})
     }
 });

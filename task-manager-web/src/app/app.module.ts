@@ -21,16 +21,3 @@ import { AppRoutingModule } from './app-routing.module';
   bootstrap: [AppComponent],
 })
 export class AppModule {}
-
-/*
-import { HttpClientModule } from '@angular/common/http';
-@NgModule({
-  imports: [
-    BrowserModule,
-    IonicModule.forRoot(),
-    AppRoutingModule,
-    HttpClientModule, // Agregamos el módulo HTTP
-  ],
-})
-export class AppModule {}
-*/
