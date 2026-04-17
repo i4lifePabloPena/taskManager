@@ -149,7 +149,7 @@ router.put("/tasks/tag/:id", authMiddleware, async(req, res) => {
         let query = {_id: id};
         const task = await Task.findOne(query);
         if (!task) return res.status(404).json({ Error: "No existe esa tarea"})
-        const { idTags } = req.body;
+        const { idTags } = req.query;
         task.idTags = idTags;
         await task.save();
         res.json(task);

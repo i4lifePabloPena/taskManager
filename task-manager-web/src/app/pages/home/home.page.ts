@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { TaskService, Task } from '../../services/task.service';
 import { AuthService } from 'src/app/services/auth.service';
-import { IonChip } from '@ionic/angular/standalone';
 import { ModalController } from '@ionic/angular';
+import { ModalTagComponent } from './modal-tag/modal-tag.component';
 
 @Component({
   selector: 'app-home',
@@ -32,8 +32,11 @@ export class HomePage implements OnInit {
     this.authService.isAdmin().subscribe((role) => {
       this.isAdmin = role == 'admin';
     });
-    this.loadTasks(-1);
   }
+
+  ionViewWillEnter = () => {
+    this.loadTasks(-1);
+  };
 
   loadTasks(n: number) {
     this.taskService.getTasks(n).subscribe((tasks) => (this.tasks = tasks));
@@ -75,4 +78,16 @@ export class HomePage implements OnInit {
   }
 
   // Añadir tags
+  async openModal() {
+    const modal = await this.modalCtrl.create({
+      component: ModalTagComponent,
+    });
+    modal.present();
+
+    // const { data, role } = await modal.onWillDismiss();
+
+    // if (role === 'confirm') {
+    //   this.message = `Hello, ${data}!`;
+    // }
+  }
 }

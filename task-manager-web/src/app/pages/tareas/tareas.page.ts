@@ -29,6 +29,10 @@ export class TareasPage implements OnInit {
     this.loadTasks(-1);
   }
 
+  ionViewWillEnter = () => {
+    this.loadTasks(-1);
+  };
+
   loadTasks(n: number) {
     this.taskService.getTasks(n).subscribe((tasks) => (this.tasks = tasks));
   }
