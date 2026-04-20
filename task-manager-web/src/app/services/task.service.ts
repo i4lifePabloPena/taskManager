@@ -1,14 +1,16 @@
-import { Injectable, Query } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { HttpHeaders } from '@angular/common/http';
+import { Tag } from './tag.service';
 
 export interface Task {
   _id?: string;
   title: string;
   status: number;
   url?: string;
+  idTags?: Tag[];
 }
 @Injectable({
   providedIn: 'root',
@@ -24,7 +26,7 @@ export class TaskService {
       `Bearer ${localStorage.getItem('token')}`,
     );
     let url = this.apiUrl;
-    url += status !== -1 ? `?status=${status}` : '?status=1&status=2&status=0'; // Si el valor es -1 devuelve la lista completa
+    url += status != -1 ? `?status=${status}` : '?status=1&status=2&status=0'; // Si el valor es -1 devuelve la lista completa
     return this.http.get<Task[]>(url, { headers });
   }
 
@@ -66,5 +68,18 @@ export class TaskService {
       `Bearer ${localStorage.getItem('token')}`,
     );
     return this.http.delete(`${this.apiUrl}/${id}`, { headers });
+  }
+
+  // Asignar tags a tarea
+  assignTag(taskId: string, tagIds: string[]): Observable<Task> {
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${localStorage.getItem('token')}`,
+    );
+    return this.http.put<Task>(
+      `${this.apiUrl}/tag/${taskId}`,
+      {},
+      { headers, params: { idTags: tagIds.join(',') } },
+    );
   }
 }

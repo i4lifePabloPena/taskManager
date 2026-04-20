@@ -21,9 +21,13 @@
   </ion-item>
   <ion-list>
     <ion-item *ngFor="let task of tasks">
-      <ion-label [color]="colorTask(task)"> {{ task.title }} </ion-label>
-      <ion-button color="tertiary" slot="end" (click)="toggleTask(task)"> <ion-icon name="play-skip-forward-outline"></ion-icon></ion-button>
+      <ion-label [color]="colorTask(task)">{{ task.title }}
+          <ion-chip *ngFor="let tag of task.idTags" color="medium">{{ tag.nameTag }}</ion-chip>
+      </ion-label>
+      <ion-button color="primary" fill="clear" slot="end" (click)="toggleTask(task)"> <ion-icon name="play-skip-forward-outline"></ion-icon></ion-button>
       <ion-button color="danger" fill="clear" (click)="deleteTask(task)"> <ion-icon name="trash"> </ion-icon> </ion-button>
+      <ion-button color="success" fill="clear" (click)="openModal(task)"><ion-icon name="pricetags-outline"></ion-icon></ion-button>
+
     </ion-item>
   </ion-list>
 </ion-content>

@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Mis Tareas</ion-title>
+    <ion-title>Mis Tareas <ion-icon *ngIf="isAdmin" name="shield-checkmark" color="success"></ion-icon> </ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -28,13 +28,14 @@
         (change)="onFileSelected($event, task._id)"
       />
       
-      <!-- Botón para subir archivo -->
+      <!-- Botón upload -->
       <ion-button 
         color="primary" 
         fill="clear" 
         slot="end"
         (click)="fileInput.click()"
         [disabled]="uploadingTaskId === task._id"
+        *ngIf="isAdmin"
       >
         <ion-icon name="image-outline"></ion-icon>
         <span *ngIf="uploadingTaskId === task._id">Subiendo...</span>

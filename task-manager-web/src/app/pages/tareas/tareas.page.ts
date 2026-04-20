@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TaskService, Task } from '../../services/task.service';
 import { ToastController } from '@ionic/angular';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-tareas',
@@ -13,15 +14,24 @@ export class TareasPage implements OnInit {
   newTaskTitle: string = '';
   fileName = '';
   uploadingTaskId: string | null = null;
+  isAdmin: boolean = false;
 
   constructor(
     private taskService: TaskService,
+    private authService: AuthService,
     private toastController: ToastController,
   ) {}
 
   ngOnInit() {
-    this.loadTasks(-1);
+    this.authService.isAdmin().subscribe((role) => {
+      this.isAdmin = role == 'admin';
+    });
+    // this.loadTasks(-1);
   }
+
+  ionViewWillEnter = () => {
+    this.loadTasks(-1);
+  };
 
   loadTasks(n: number) {
     this.taskService.getTasks(n).subscribe((tasks) => (this.tasks = tasks));

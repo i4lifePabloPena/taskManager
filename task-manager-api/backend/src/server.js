@@ -16,10 +16,11 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 connectDB(); 
 const taskRoutes = require('./routes/tasks.routes');
 const authRoutes = require('./routes/auth.routes');
+const tagRoutes = require('./routes/tag.routes.js')
 
-app.use('/api', taskRoutes); 
-
+app.use('/api', taskRoutes);
 app.use('/api', authRoutes);
+app.use('/api', tagRoutes);
 
 app.get('/', (req, res) => { 
     res.send('¡Servidor funcionando!'); 

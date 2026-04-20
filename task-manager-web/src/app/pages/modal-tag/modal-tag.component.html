@@ -1,0 +1,52 @@
+<!-- Header -->
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Tags</ion-title>
+      <ion-button (click)="exit()" slot="end" [strong]="true">Exit</ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<!-- Body -->
+<ion-content class="ion-padding">
+
+  <!-- Task Title -->
+  <ion-title>{{ task.title }}</ion-title>
+
+  <!-- Task Tags -->
+  <ion-item>
+    <ion-label>
+      Tags actuales:
+      <ion-chip *ngFor="let tag of task.idTags" color="primary">
+        {{ tag.nameTag }}
+      </ion-chip>
+    </ion-label>
+  </ion-item>
+
+  <!-- Aply New Tags -->
+  <ion-item>
+    <ion-label>Seleccionar tags</ion-label>
+    <ion-select [(ngModel)]="selectedTagIds" multiple placeholder="Elige una o más tags">
+      <ion-select-option *ngFor="let tag of tags" [value]="tag._id">{{ tag.nameTag }}</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-button expand="block" (click)="assignTag()" [disabled]="!selectedTagIds.length">Asignar Tags</ion-button>
+
+  <!-- Crear nueva tag -->
+  <ion-item>
+    <ion-label position="stacked">Crear nueva tag</ion-label>
+    <ion-input [(ngModel)]="newTagName" placeholder="Nombre de la nueva tag"></ion-input>
+  </ion-item>
+
+  <ion-button expand="block" (click)="createTag()" [disabled]="!newTagName">Crear Tag</ion-button>
+
+  <!-- Lista de tags -->
+  <ion-list>
+    <ion-item *ngFor="let tag of tags">
+      <ion-button *ngIf="isAdmin" (click)="deleteTag(tag)"  color="danger" fill="clear" slot="end"><ion-icon name="trash"></ion-icon></ion-button>
+      <ion-label>{{ tag.nameTag }}</ion-label>
+    </ion-item>
+  </ion-list>
+
+
+</ion-content>
