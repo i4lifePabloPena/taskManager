@@ -7,19 +7,19 @@ const Tag = require("../models/tagModel");
 // Crear nueva tag
 router.post('/tag', authMiddleware, async(req, res) => {
     try{
-        const{nameTag} = req.query
+        const { nameTag } = req.body;
         if (!nameTag) return res.status(400).json({Error: "nameTag requerida"});
         const tag = new Tag({nameTag});
         await tag.save();
         res.json(tag);
-    }catch (error){
+    } catch (error) {
         res.status(400).json({Error: "Ya existe esa tag"});
     }
 });
 module.exports = router;
 
 // Lee las tags existentes
-router.get('/tag', async (req, res) =>{
+router.get('/tag', authMiddleware, async (req, res) =>{
     try{
         const tags = await Tag.find();
         res.json(tags);

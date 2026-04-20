@@ -26,7 +26,7 @@ export class TareasPage implements OnInit {
     this.authService.isAdmin().subscribe((role) => {
       this.isAdmin = role == 'admin';
     });
-    this.loadTasks(-1);
+    // this.loadTasks(-1);
   }
 
   ionViewWillEnter = () => {

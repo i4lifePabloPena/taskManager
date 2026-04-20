@@ -35,10 +35,10 @@ const upload = multer({
 router.get('/tasks', authMiddleware, async (req, res) => {
     try {
         let query = { status: req.query.status };
-        if (req.userRole !== 'admin') {
+        if (req.userRole != 'admin') {
             query.userId = req.userId;
         }
-        const tasks = await Task.find(query);
+        const tasks = await Task.find(query).populate('idTags');
         res.json(tasks);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener tareas'});
@@ -55,7 +55,7 @@ router.post('/tasks/:id/upload', authMiddleware, upload.single('file'), async (r
         }
         
         let query = { _id: id };
-        if (req.userRole !== 'admin') {
+        if (req.userRole != 'admin') {
             query.userId = req.userId;
         }
         
@@ -90,23 +90,12 @@ router.put('/tasks/:id', authMiddleware, async (req, res) => {
     try {
         const { id } = req.params;
         let query = { _id: id };
-        if (req.userRole !== 'admin') {
+        if (req.userRole != 'admin') {
             query.userId = req.userId;
         }
         const task = await Task.findOne(query);
         if (!task) return res.status(404).json({ error: "Tarea no encontrada" });
-
-        switch (task.status) {
-            case 0:
-                task.status = 1;
-                break;
-            case 1:
-                task.status = 2;
-                break;
-            default:
-                task.status = 0;
-        }
-
+        task.status = (task.status != 2) ? task.status+1 : 0; // Si task es 2 se resetea a 0 si no +1
         await task.save();
         res.json(task);
     } catch (error) {
@@ -119,7 +108,7 @@ router.delete('/tasks/:id', authMiddleware, async (req, res) => {
     try {
         const { id } = req.params;
         let query = { _id: id };
-        if (req.userRole !== 'admin') {
+        if (req.userRole != 'admin') {
             query.userId = req.userId;
         }
         const task = await Task.findOne(query);
@@ -141,20 +130,32 @@ router.delete('/tasks/:id', authMiddleware, async (req, res) => {
 });
 
 // Agregar tags 
-// 16 - 04 -26 lo deje aqui
-
 router.put("/tasks/tag/:id", authMiddleware, async(req, res) => {
-    try{
-        const {id} = req.params;
-        let query = {_id: id};
+    try {
+        const { id } = req.params;
+        let query = { _id: id };
+        if (req.userRole != 'admin') {
+            query.userId = req.userId;
+        }
         const task = await Task.findOne(query);
-        if (!task) return res.status(404).json({ Error: "No existe esa tarea"})
-        const { idTags } = req.query;
+        if (!task) return res.status(404).json({ Error: "La tarea no existe" });
+
+        const idTagsQuery = req.query.idTags; //req.body.idTags || 
+        let idTags = [];
+
+        // OJO
+        if (Array.isArray(idTagsQuery)) {
+            idTags = idTagsQuery;
+        } else if (typeof idTagsQuery === 'string') {
+            idTags = idTagsQuery.split(',').filter(Boolean);
+        }
+
         task.idTags = idTags;
         await task.save();
+        await task.populate('idTags', 'nameTag');
         res.json(task);
-    } catch(error) {
-        res.status(500).json({ Error: "Error al añadir el tag"})
+    } catch (error) {
+        res.status(500).json({ Error: "Error al añadir el tag" });
     }
 });
 module.exports = router;

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { TaskService, Task } from '../../services/task.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { ModalController } from '@ionic/angular';
-import { ModalTagComponent } from './modal-tag/modal-tag.component';
+import { ModalTagComponent } from '../modal-tag/modal-tag.component';
 
 @Component({
   selector: 'app-home',
@@ -58,7 +58,7 @@ export class HomePage implements OnInit {
 
   deleteTask(task: Task) {
     this.taskService.deleteTask(task._id!).subscribe(() => {
-      this.tasks = this.tasks.filter((t) => t._id !== task._id);
+      this.tasks = this.tasks.filter((t) => t._id != task._id);
     });
   }
 
@@ -66,7 +66,7 @@ export class HomePage implements OnInit {
     let color: string;
     switch (task.status) {
       case 0:
-        color = 'default';
+        color = 'dark';
         break;
       case 1:
         color = 'warning';
@@ -77,17 +77,14 @@ export class HomePage implements OnInit {
     return color;
   }
 
-  // Añadir tags
-  async openModal() {
+  // modal tags
+  async openModal(task: Task) {
     const modal = await this.modalCtrl.create({
       component: ModalTagComponent,
+      componentProps: {
+        task,
+      },
     });
-    modal.present();
-
-    // const { data, role } = await modal.onWillDismiss();
-
-    // if (role === 'confirm') {
-    //   this.message = `Hello, ${data}!`;
-    // }
+    await modal.present();
   }
 }
