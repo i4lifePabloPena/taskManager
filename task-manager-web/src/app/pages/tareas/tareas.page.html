@@ -17,7 +17,8 @@
       
 
       <!-- Imagen -->
-      <!-- <ion-img *ngIf="task.url" [src]="task.url" alt="Tarea imagen"></ion-img> -->
+      <ion-button *ngIf="task.url" color="tertiary" (click)="fileDelete(task)"> <ion-icon name="close-circle-outline"></ion-icon></ion-button>
+
       <img *ngIf="task.url" [src]="task.url" alt="Tarea imagen" width="250px" height="250px">
       <!-- Input de archivo -->
       <input 

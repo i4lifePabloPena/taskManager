@@ -26,7 +26,6 @@ export class TareasPage implements OnInit {
     this.authService.isAdmin().subscribe((role) => {
       this.isAdmin = role == 'admin';
     });
-    // this.loadTasks(-1);
   }
 
   ionViewWillEnter = () => {
@@ -70,19 +69,29 @@ export class TareasPage implements OnInit {
     return color;
   }
 
-  // subida de archivos
+  /* Subida de archivos
+    Esto por lo que a mi respecta funciona con sueños y esperanzas
+
+    ToDo: Refactorizar
+  */
   onFileSelected(event: any, taskId: string) {
     const file: File = event.target.files[0];
     if (!file) return;
-
-    // isImage
     if (!file.type.startsWith('image/')) {
       this.presentToast('Solo se permiten imágenes', 'danger');
       return;
     }
-
-    // update
     this.uploadingTaskId = taskId;
+    const task = this.tasks.find((t) => t._id === taskId);
+    if (task && task.url) {
+      this.taskService.deleteFile(taskId).subscribe(() => {
+        this.uploadNewFile(taskId, file);
+      });
+    } else {
+      this.uploadNewFile(taskId, file);
+    }
+  }
+  private uploadNewFile(taskId: string, file: File) {
     this.taskService.uploadFile(taskId, file).subscribe(
       (response) => {
         const taskIndex = this.tasks.findIndex((t) => t._id === taskId);
@@ -102,10 +111,20 @@ export class TareasPage implements OnInit {
     );
   }
 
+  // File Delete
+  async fileDelete(task: Task) {
+    this.taskService.deleteFile(task._id!).subscribe((updatedTask) => {
+      const taskIndex = this.tasks.findIndex((t) => t._id === task._id);
+      this.tasks[taskIndex] = updatedTask;
+      this.presentToast('File deleted', 'success');
+    });
+  }
+
+  // Toast
   async presentToast(text: string, color: string) {
     const toast = await this.toastController.create({
       message: text,
-      duration: 3000,
+      duration: 5000,
       color: color,
       position: 'bottom',
     });
