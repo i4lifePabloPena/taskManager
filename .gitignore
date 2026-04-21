@@ -1,7 +1,7 @@
 # Perso
 /delete
-uploads/*
-!uploads/
+./uploads/*
+!./uploads/
 
 
 # Angular specific
