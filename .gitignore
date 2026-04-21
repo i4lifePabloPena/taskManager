@@ -1,6 +1,8 @@
 # Perso
 /delete
-uploads/**
+uploads/*
+!uploads/
+
 
 # Angular specific
 /dist/
