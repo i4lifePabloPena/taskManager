@@ -3,6 +3,7 @@ import { TaskService, Task } from '../../services/task.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { ModalController } from '@ionic/angular';
 import { ModalTagComponent } from '../modal-tag/modal-tag.component';
+import { TagService, Tag } from '../../services/tag.service';
 
 @Component({
   selector: 'app-home',
@@ -14,11 +15,13 @@ export class HomePage implements OnInit {
   tasks: Task[] = [];
   newTaskTitle: string = '';
   isAdmin: boolean = false;
+  tags: Tag[] = [];
 
   constructor(
     private taskService: TaskService,
     private authService: AuthService,
     private modalCtrl: ModalController,
+    private tagService: TagService,
   ) {}
 
   logout() {
@@ -36,7 +39,32 @@ export class HomePage implements OnInit {
 
   ionViewWillEnter = () => {
     this.loadTasks(-1);
+    this.loadTags();
   };
+
+  loadTags() {
+    this.tagService.getTags().subscribe((tags) => {
+      this.tags = tags;
+    });
+  }
+
+  filterTasks(idTag: CustomEvent) {
+    console.log('ionChange fired with value: ' + idTag.detail.value);
+    // var idTags: string[] = idTag.detail.value;
+    var test: String = idTag.detail.value;
+    this.tasks.forEach((task) => {
+      task.idTags?.forEach((tag) => {
+        if (tag._id == idTag.detail.value)
+          this.tasks.splice(this.tasks.indexOf(task), 1);
+      });
+    });
+  }
+
+  // filterTasks(event: CustomEvent) {
+  //   this.tags.forEach((tag) => {
+  //     console.log('ionChange fired with value: ' + event.detail.value);
+  //   });
+  // }
 
   loadTasks(n: number) {
     this.taskService.getTasks(n).subscribe((tasks) => (this.tasks = tasks));
@@ -86,5 +114,12 @@ export class HomePage implements OnInit {
       },
     });
     await modal.present();
+  }
+
+  // Chips
+  chipStatus0() {
+    let status: boolean;
+    status = true;
+    return status;
   }
 }

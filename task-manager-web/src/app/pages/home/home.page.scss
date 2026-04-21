@@ -1,3 +1,4 @@
+// Default
 #container {
   text-align: center;
 
@@ -24,4 +25,10 @@
 
 #container a {
   text-decoration: none;
+}
+
+// Perso
+ion-select {
+  --placeholder-opacity: 1;
+  width: 10%;
 }
