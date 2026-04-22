@@ -13,9 +13,11 @@ import { TagService, Tag } from '../../services/tag.service';
 })
 export class HomePage implements OnInit {
   tasks: Task[] = [];
+  allTasks: Task[] = [];
   newTaskTitle: string = '';
   isAdmin: boolean = false;
   tags: Tag[] = [];
+  filterStatus: number = -1;
 
   constructor(
     private taskService: TaskService,
@@ -38,7 +40,7 @@ export class HomePage implements OnInit {
   }
 
   ionViewWillEnter = () => {
-    this.loadTasks(-1);
+    this.loadTasks();
     this.loadTags();
   };
 
@@ -48,26 +50,43 @@ export class HomePage implements OnInit {
     });
   }
 
+  /* Sistema de filtro por tags
+   * by: chapuzarro
+   */
   filterTasks(idTag: CustomEvent) {
-    console.log('ionChange fired with value: ' + idTag.detail.value);
-    // var idTags: string[] = idTag.detail.value;
-    var test: String = idTag.detail.value;
-    this.tasks.forEach((task) => {
-      task.idTags?.forEach((tag) => {
-        if (tag._id == idTag.detail.value)
-          this.tasks.splice(this.tasks.indexOf(task), 1);
-      });
-    });
+    if (idTag.detail.value != 'All') {
+      this.taskService
+        .getTasks(this.filterStatus)
+        .subscribe((allTasksComplete) => {
+          this.allTasks = allTasksComplete;
+          this.tasks = [];
+          var isTag: boolean;
+          this.allTasks.forEach((task) => {
+            isTag = false;
+            task.idTags?.forEach((tag) => {
+              if (tag._id! == idTag.detail.value) {
+                isTag = true;
+              }
+            });
+            if (isTag) {
+              this.tasks.push(task);
+            }
+          });
+        });
+    } else {
+      this.loadTasks();
+    }
   }
 
-  // filterTasks(event: CustomEvent) {
-  //   this.tags.forEach((tag) => {
-  //     console.log('ionChange fired with value: ' + event.detail.value);
-  //   });
-  // }
+  loadTasks() {
+    this.taskService
+      .getTasks(this.filterStatus)
+      .subscribe((tasks) => (this.tasks = tasks));
+  }
 
-  loadTasks(n: number) {
-    this.taskService.getTasks(n).subscribe((tasks) => (this.tasks = tasks));
+  changeFilterStatus(n: number) {
+    this.filterStatus = n;
+    this.loadTasks();
   }
 
   addTask() {
@@ -114,12 +133,5 @@ export class HomePage implements OnInit {
       },
     });
     await modal.present();
-  }
-
-  // Chips
-  chipStatus0() {
-    let status: boolean;
-    status = true;
-    return status;
   }
 }

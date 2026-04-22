@@ -13,7 +13,7 @@
 <ion-content class="ion-padding">
   <ion-list>
     <!-- <ion-item> -->
-      <ion-select class="ion-float-left" #statusFilter (ionChange)="loadTasks(statusFilter.value)" toggleIcon="funnel-outline" label="Task Status" interface="popover" label-placement="floating" fill="outline">
+      <ion-select class="ion-float-left" #statusFilter (ionChange)="changeFilterStatus(statusFilter.value)" toggleIcon="funnel-outline" label="Task Status" interface="popover" label-placement="floating" fill="outline">
         <ion-select-option value="-1">All</ion-select-option>
         <ion-select-option value="0">Pendientes</ion-select-option>
         <ion-select-option value="1">En Progreso</ion-select-option>
@@ -30,11 +30,12 @@
           fill="outline"
           (ionChange)="filterTasks($event)"
         >
+          <ion-select-option>All</ion-select-option>
           <ion-select-option value="{{tag._id}}" *ngFor="let tag of tags">{{tag.nameTag}}</ion-select-option>
         </ion-select>
       <!-- </ion-item> -->
       <ion-item class="ion-float">
-        <ion-input [(ngModel)]="newTaskTitle" name="newTaskTitle" placeholder="New Task"></ion-input>
+        <ion-input clear-input="true" [(ngModel)]="newTaskTitle" name="newTaskTitle" placeholder="New Task"></ion-input>
         <ion-button (click)="addTask()">ADD</ion-button>
       </ion-item>
   </ion-list>

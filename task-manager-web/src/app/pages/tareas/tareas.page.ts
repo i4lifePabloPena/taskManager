@@ -70,7 +70,7 @@ export class TareasPage implements OnInit {
   }
 
   /* Subida de archivos
-    Esto por lo que a mi respecta funciona con sueños y esperanzas
+    Esto, por lo que a mi respecta, funciona con mis sueños y esperanzas
 
     ToDo: Refactorizar
   */
@@ -124,7 +124,7 @@ export class TareasPage implements OnInit {
   async presentToast(text: string, color: string) {
     const toast = await this.toastController.create({
       message: text,
-      duration: 5000,
+      duration: 3000,
       color: color,
       position: 'bottom',
     });

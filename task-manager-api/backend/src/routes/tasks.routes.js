@@ -170,10 +170,9 @@ router.put("/tasks/tag/:id", authMiddleware, async(req, res) => {
         const task = await Task.findOne(query);
         if (!task) return res.status(404).json({ Error: "La tarea no existe" });
 
-        const idTagsQuery = req.query.idTags; //req.body.idTags || 
+        const idTagsQuery = req.query.idTags; 
         let idTags = [];
 
-        // OJO
         if (Array.isArray(idTagsQuery)) {
             idTags = idTagsQuery;
         } else if (typeof idTagsQuery === 'string') {

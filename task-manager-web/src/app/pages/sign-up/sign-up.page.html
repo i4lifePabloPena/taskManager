@@ -6,20 +6,56 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+  <!-- Usuario -->
   <ion-item>
-    <ion-input [(ngModel)]="username" name="username" placeholder="Usuario"></ion-input>
+    <ion-input
+    [(ngModel)]="username"
+    name="username"
+    placeholder="Usuario"
+
+    ></ion-input>
   </ion-item>
+  <!-- Contraseña -->
   <ion-item>
-    <ion-input [(ngModel)]="password" name="password" type="password" placeholder="Contraseña"></ion-input>
+    <ion-input
+    [(ngModel)]="password"
+    name="password"
+    type="password"
+    placeholder="Contraseña"
+
+    ></ion-input>
   </ion-item>
+  <!-- Confirmar Contraseña -->
     <ion-item>
-      <ion-input [(ngModel)]="confirmPassword" name="confirmPassword" type="password" placeholder="Confirmar Contraseña"></ion-input>
+      <ion-input
+      [(ngModel)]="confirmPassword"
+      name="confirmPassword"
+      type="password"
+      placeholder="Confirmar Contraseña"
+
+      ></ion-input>
   </ion-item>
+  <!-- Nombre -->
     <ion-item>
-    <ion-input [(ngModel)]="name" name="name" placeholder="Nombre"></ion-input>
+    <ion-input
+    [(ngModel)]="name"
+    name="name"
+    placeholder="Nombre"
+    ></ion-input>
   </ion-item>
+  <!-- Correo -->
     <ion-item>
-    <ion-input type="email" errorText="Invalid email" [(ngModel)]="email" name="email" placeholder="Email"></ion-input>
+    <ion-input
+    type="email"
+    inputmode="email"
+    name="email"
+    placeholder="Email"
+    errorText="Invalid email"
+    [(ngModel)]="email"
+
+    required="true"
+    ></ion-input>
+    <!-- Resgistrarse -->
   </ion-item>
-  <ion-button type="button" (click)="register()">Registrarse</ion-button>
+  <ion-button  type="button" (click)="register()">Registrarse</ion-button>
 </ion-content>

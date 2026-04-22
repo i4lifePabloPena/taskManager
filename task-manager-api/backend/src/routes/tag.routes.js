@@ -31,6 +31,9 @@ router.get('/tag', authMiddleware, async (req, res) =>{
 // Delete tag
 router.delete('/tag/:id', authMiddleware, async(req, res) =>{
     try{
+        if (req.userRole != "admin") {
+            return res.status(401).json({ error: "Acceso denegado" });
+        }
         const {id} = req.params;
         let query ={_id: id};
         const tag = await Tag.findOne(query);
