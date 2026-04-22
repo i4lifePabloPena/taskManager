@@ -15,6 +15,7 @@ export class TareasPage implements OnInit {
   fileName = '';
   uploadingTaskId: string | null = null;
   isAdmin: boolean = false;
+  filterStatus: number = -1;
 
   constructor(
     private taskService: TaskService,
@@ -29,11 +30,18 @@ export class TareasPage implements OnInit {
   }
 
   ionViewWillEnter = () => {
-    this.loadTasks(-1);
+    this.loadTasks();
   };
 
-  loadTasks(n: number) {
-    this.taskService.getTasks(n).subscribe((tasks) => (this.tasks = tasks));
+  loadTasks() {
+    this.taskService
+      .getTasks(this.filterStatus)
+      .subscribe((tasks) => (this.tasks = tasks));
+  }
+
+  changeFilterStatus(n: number) {
+    this.filterStatus = n;
+    this.loadTasks();
   }
 
   addTask() {
@@ -44,8 +52,10 @@ export class TareasPage implements OnInit {
     });
   }
 
-  toggleTask(task: any) {
-    this.taskService.updateTask(task._id).subscribe(); // , task.completed
+  toggleTask(task: Task) {
+    this.taskService.updateTask(task._id!).subscribe((updatedTask) => {
+      task.status = updatedTask.status;
+    });
   }
 
   deleteTask(id: string) {
@@ -58,7 +68,7 @@ export class TareasPage implements OnInit {
     let color: string;
     switch (task.status) {
       case 0:
-        color = 'default';
+        color = 'dark';
         break;
       case 1:
         color = 'warning';

@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { ModalController } from '@ionic/angular';
 import { ModalTagComponent } from '../modal-tag/modal-tag.component';
 import { TagService, Tag } from '../../services/tag.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-home',
@@ -24,6 +25,7 @@ export class HomePage implements OnInit {
     private authService: AuthService,
     private modalCtrl: ModalController,
     private tagService: TagService,
+    // private swal: Swal,
   ) {}
 
   logout() {
@@ -94,6 +96,7 @@ export class HomePage implements OnInit {
     this.taskService.addTask(this.newTaskTitle).subscribe((task) => {
       this.tasks.push(task);
       this.newTaskTitle = '';
+      this.addTaskAlert();
     });
   }
 
@@ -133,5 +136,17 @@ export class HomePage implements OnInit {
       },
     });
     await modal.present();
+  }
+
+  // sweet alert 2
+  addTaskAlert() {
+    Swal.fire({
+      heightAuto: false,
+      title: 'Tarea Creada',
+      // text: 'Do you want to continue',
+      icon: 'success',
+      confirmButtonText: 'Nice',
+      theme: 'auto',
+    });
   }
 }

@@ -5,6 +5,7 @@ const path = require('path');
 const connectDB = require('./config/db.js'); 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const nodemailer = require("nodemailer"); // Mail
 
 app.use(cors());
 app.use(express.json()); // Permite recibir JSON en las solicitudes
@@ -30,3 +31,24 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => { 
     console.log(`Servidor corriendo en http://localhost:${PORT}`); 
 }); 
+
+/*
+// mail
+
+// Transporter
+
+// Crear una nueva cuenta de Ethereal
+const testAccount = await nodemailer.createTestAccount();
+
+// Crear un transporter con la cuenta Ethereal
+const transporter = nodemailer.createTransport({
+    host: testAccount.smtp.host,
+    port: testAccount.smtp.port,
+    secure: testAccount.smtp.secure,
+    auth: {
+        user: testAccount.user,
+        pass: testAccount.pass
+    },
+});
+
+*/
