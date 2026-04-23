@@ -91,4 +91,13 @@ export class TaskService {
       { headers, params: { idTags: tagIds.join(',') } },
     );
   }
+
+  // Enviar correo al dueño de la tarea
+  sendMail(taskId: string): Observable<any> {
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${localStorage.getItem('token')}`,
+    );
+    return this.http.post(`${this.apiUrl}/${taskId}/send-mail`, {}, { headers });
+  }
 }

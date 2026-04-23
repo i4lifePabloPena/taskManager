@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Task = require('../models/Task.js');
+const User = require('../models/user.model');
 const authMiddleware = require('../middleware/auth.middleware');
+const { sendMail } = require('../services/mailService');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -187,4 +189,33 @@ router.put("/tasks/tag/:id", authMiddleware, async(req, res) => {
         res.status(500).json({ Error: "Error al añadir el tag" });
     }
 });
+
+// Enviar correo
+router.post('/tasks/:id/send-mail', authMiddleware, async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (req.userRole != 'admin') {
+            return res.status(401).json({ error: 'Acceso denegado' });
+        }
+        const task = await Task.findById(id);
+        if (!task) return res.status(404).json({ error: "Tarea no encontrada" });
+
+        const user = await User.findById(task.userId);
+        if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+
+        const subject = 'Tarea Eliminada';
+        const text = `La tarea "${task.title}" ha sido eliminada por un administrador.`;
+        const html = `<h1>Notificación</h1><p>La tarea "<b>${task.title}</b>" ha sido eliminada por un administrador.</p>`;
+
+        const result = await sendMail(user.email, subject, text, html);
+        if (result.success) {
+            res.json({ message: 'Correo enviado', messageId: result.messageId, previewUrl: result.previewUrl });
+        } else {
+            res.status(500).json({ error: 'Error al enviar correo', details: result.error });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Error al enviar correo' });
+    }
+});
+
 module.exports = router;

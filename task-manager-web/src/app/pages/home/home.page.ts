@@ -5,7 +5,6 @@ import { ModalController } from '@ionic/angular';
 import { ModalTagComponent } from '../modal-tag/modal-tag.component';
 import { TagService, Tag } from '../../services/tag.service';
 import Swal from 'sweetalert2';
-// import { MailService } from '../../services/mail.service';
 
 @Component({
   selector: 'app-home',
@@ -26,7 +25,6 @@ export class HomePage implements OnInit {
     private authService: AuthService,
     private modalCtrl: ModalController,
     private tagService: TagService,
-    // private mailService: MailService,
   ) {}
 
   logout() {
@@ -144,7 +142,6 @@ export class HomePage implements OnInit {
     Swal.fire({
       heightAuto: false,
       title: 'Tarea Creada',
-      // text: 'Do you want to continue',
       icon: 'success',
       confirmButtonText: 'Nice',
       theme: 'auto',
@@ -174,7 +171,7 @@ export class HomePage implements OnInit {
     if (result.isConfirmed) {
       this.deleteTask(task);
       if (result.value) {
-        this.sendMail();
+        this.sendMail(task);
       }
     }
   }
@@ -196,5 +193,30 @@ export class HomePage implements OnInit {
     });
   }
 
-  sendMail() {}
+  sendMail(task: Task) {
+    this.taskService.sendMail(task._id!).subscribe({
+      next: (response) => {
+        console.log('Correo enviado:', response);
+        Swal.fire({
+          heightAuto: false,
+          title: 'Correo enviado',
+          text: 'Se ha enviado un correo al dueño de la tarea.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+          theme: 'auto',
+        });
+      },
+      error: (error) => {
+        console.error('Error al enviar correo:', error);
+        Swal.fire({
+          heightAuto: false,
+          title: 'Error',
+          text: 'No se pudo enviar el correo.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+          theme: 'auto',
+        });
+      },
+    });
+  }
 }
