@@ -11,23 +11,44 @@
 <ion-button [routerLink]="['/tareas']">Ir aTareas</ion-button>
 
 <ion-content class="ion-padding">
-<ion-chip default (click)="loadTasks(-1)">All</ion-chip>
-<ion-chip (click)="loadTasks(0)">Pendientes</ion-chip>
-<ion-chip (click)="loadTasks(1)">En Progreso</ion-chip>
-<ion-chip (click)="loadTasks(2)">Completadas</ion-chip>
-  <ion-item>
-    <ion-input [(ngModel)]="newTaskTitle" name="newTaskTitle" placeholder="Nueva tarea"></ion-input>
-    <ion-button (click)="addTask()">Añadir</ion-button>
-  </ion-item>
+  <ion-list>
+    <!-- <ion-item> -->
+      <ion-select class="ion-float-left" #statusFilter (ionChange)="changeFilterStatus(statusFilter.value)" toggleIcon="funnel-outline" label="Task Status" interface="popover" label-placement="floating" fill="outline">
+        <ion-select-option value="-1">All</ion-select-option>
+        <ion-select-option value="0">Pendientes</ion-select-option>
+        <ion-select-option value="1">En Progreso</ion-select-option>
+        <ion-select-option value="2">Completadas</ion-select-option>
+      </ion-select>
+    <!-- </ion-item> -->
+      <!-- <ion-item>         -->
+        <ion-select 
+          class="ion-float-left"
+          toggleIcon="pricetags-outline"
+          label="Tags"
+          interface="popover"
+          label-placement="floating"
+          fill="outline"
+          (ionChange)="filterTasks($event)"
+        >
+          <ion-select-option>All</ion-select-option>
+          <ion-select-option value="{{tag._id}}" *ngFor="let tag of tags">{{tag.nameTag}}</ion-select-option>
+        </ion-select>
+      <!-- </ion-item> -->
+      <ion-item class="ion-float">
+        <ion-input clear-input="true" [(ngModel)]="newTaskTitle" name="newTaskTitle" placeholder="New Task"></ion-input>
+        <ion-button (click)="addTask()">ADD</ion-button>
+      </ion-item>
+  </ion-list>
   <ion-list>
     <ion-item *ngFor="let task of tasks">
       <ion-label [color]="colorTask(task)">{{ task.title }}
           <ion-chip *ngFor="let tag of task.idTags" color="medium">{{ tag.nameTag }}</ion-chip>
       </ion-label>
       <ion-button color="primary" fill="clear" slot="end" (click)="toggleTask(task)"> <ion-icon name="play-skip-forward-outline"></ion-icon></ion-button>
-      <ion-button color="danger" fill="clear" (click)="deleteTask(task)"> <ion-icon name="trash"> </ion-icon> </ion-button>
-      <ion-button color="success" fill="clear" (click)="openModal(task)"><ion-icon name="pricetags-outline"></ion-icon></ion-button>
+      <ion-button color="danger" fill="clear" (click)="deleteTaskAlert(task)"> <ion-icon name="trash"> </ion-icon> </ion-button>
+      <ion-button color="success" fill="clear" (click)="openModal(task)"><ion-icon name="pricetag-outline"></ion-icon></ion-button>
 
     </ion-item>
   </ion-list>
 </ion-content>
+<!-- <ion-button (click)="deleteTaskAlert()">test</ion-button> -->

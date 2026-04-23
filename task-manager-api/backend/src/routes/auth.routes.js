@@ -4,12 +4,17 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const router = express.Router();
 const SECRET_KEY = 'DYKL+WK+SjXTEHj6RKLMsowPXqvqkdZZEW0gooPShXI='; // Cambiar por una clavesegura
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 
 // Registro de usuario
 router.post('/register', async (req, res) => {
     try {
         const { username, password, role, name, email } = req.body;
         const user = new User({ username, password, role, name, email, createdAt: new Date()});
+        if (!emailRegex.test(user.email)) {
+            return res.status(500).json({ error: "Correo no válido" });
+        }
         await user.save();
         res.status(201).json({ message: 'Usuario creado' });
     } catch (error) {

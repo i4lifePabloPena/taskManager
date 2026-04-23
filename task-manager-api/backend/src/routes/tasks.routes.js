@@ -49,26 +49,54 @@ router.get('/tasks', authMiddleware, async (req, res) => {
 // Subir archivo
 router.post('/tasks/:id/upload', authMiddleware, upload.single('file'), async (req, res) => {
     try {
-        const { id } = req.params;
-        if (!req.file) {
-            return res.status(400).json({ error: 'No hay archivo' });
-        }
-        
-        let query = { _id: id };
         if (req.userRole != 'admin') {
-            query.userId = req.userId;
+            return res.status(401).json({ error: 'Acceso denegado' })
+        } else{
+            const { id } = req.params;
+            if (!req.file) {
+                return res.status(400).json({ error: 'No hay archivo' });
+            }
+            
+            let query = { _id: id };
+            
+            const task = await Task.findOne(query);
+            if (!task) return res.status(404).json({ error: "La tarea no existe" });
+            
+            const fileUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+            task.url = fileUrl;
+            await task.save();
+            
+            res.json({ message: 'Archivo subido', url: fileUrl, task });
         }
-        
-        const task = await Task.findOne(query);
-        if (!task) return res.status(404).json({ error: "La tarea no existe" });
-        
-        const fileUrl = `http://localhost:5000/uploads/${req.file.filename}`;
-        task.url = fileUrl;
-        await task.save();
-        
-        res.json({ message: 'Archivo subido', url: fileUrl, task });
     } catch (error) {
         res.status(500).json({ error: error.message || 'Error al subir el archivo' });
+    }
+});
+
+// Eliminar un archivo
+router.delete("/tasks/img/:id", authMiddleware, async (req, res) => {
+    try {
+        const { id } = req.params;
+        let query = { _id: id };
+        if (req.userRole != "admin") {
+            return res.status(401).json({ error: "Acceso denegado" });
+        }
+        const task = await Task.findOne(query);
+        if (!task) {
+            return res.status(404).json({ Error: "Tarea no encontrada" });
+        }
+        if (task.url) {
+            const filename = path.basename(task.url);
+            const filePath = path.join(uploadDir, filename);
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+                task.url = null;
+                await task.save();
+            }
+        }
+        res.json(task);
+    } catch (error) {
+        res.status(500).json({ Error: "Error al eliminar el archivo" });
     }
 });
 
@@ -103,6 +131,7 @@ router.put('/tasks/:id', authMiddleware, async (req, res) => {
     }
 });
 
+
 // Eliminar una tarea
 router.delete('/tasks/:id', authMiddleware, async (req, res) => {
     try {
@@ -116,7 +145,8 @@ router.delete('/tasks/:id', authMiddleware, async (req, res) => {
         
         // delete imagen
         if (task.url) {
-            const filePath = path.join(__dirname, '../../', task.url);
+            const filename = path.basename(task.url);
+            const filePath = path.join(uploadDir, filename);
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
             }
@@ -140,10 +170,9 @@ router.put("/tasks/tag/:id", authMiddleware, async(req, res) => {
         const task = await Task.findOne(query);
         if (!task) return res.status(404).json({ Error: "La tarea no existe" });
 
-        const idTagsQuery = req.query.idTags; //req.body.idTags || 
+        const idTagsQuery = req.query.idTags; 
         let idTags = [];
 
-        // OJO
         if (Array.isArray(idTagsQuery)) {
             idTags = idTagsQuery;
         } else if (typeof idTagsQuery === 'string') {

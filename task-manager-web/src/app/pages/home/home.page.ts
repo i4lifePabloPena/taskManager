@@ -3,6 +3,9 @@ import { TaskService, Task } from '../../services/task.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { ModalController } from '@ionic/angular';
 import { ModalTagComponent } from '../modal-tag/modal-tag.component';
+import { TagService, Tag } from '../../services/tag.service';
+import Swal from 'sweetalert2';
+// import { MailService } from '../../services/mail.service';
 
 @Component({
   selector: 'app-home',
@@ -12,13 +15,18 @@ import { ModalTagComponent } from '../modal-tag/modal-tag.component';
 })
 export class HomePage implements OnInit {
   tasks: Task[] = [];
+  allTasks: Task[] = [];
   newTaskTitle: string = '';
   isAdmin: boolean = false;
+  tags: Tag[] = [];
+  filterStatus: number = -1;
 
   constructor(
     private taskService: TaskService,
     private authService: AuthService,
     private modalCtrl: ModalController,
+    private tagService: TagService,
+    // private mailService: MailService,
   ) {}
 
   logout() {
@@ -35,11 +43,53 @@ export class HomePage implements OnInit {
   }
 
   ionViewWillEnter = () => {
-    this.loadTasks(-1);
+    this.loadTasks();
+    this.loadTags();
   };
 
-  loadTasks(n: number) {
-    this.taskService.getTasks(n).subscribe((tasks) => (this.tasks = tasks));
+  loadTags() {
+    this.tagService.getTags().subscribe((tags) => {
+      this.tags = tags;
+    });
+  }
+
+  /* Sistema de filtro por tags
+   * by: chapuzarro
+   */
+  filterTasks(idTag: CustomEvent) {
+    if (idTag.detail.value != 'All') {
+      this.taskService
+        .getTasks(this.filterStatus)
+        .subscribe((allTasksComplete) => {
+          this.allTasks = allTasksComplete;
+          this.tasks = [];
+          var isTag: boolean;
+          this.allTasks.forEach((task) => {
+            isTag = false;
+            task.idTags?.forEach((tag) => {
+              if (tag._id! == idTag.detail.value) {
+                isTag = true;
+              }
+            });
+            if (isTag) {
+              this.tasks.push(task);
+            }
+          });
+        });
+    } else {
+      this.loadTasks();
+    }
+  }
+
+  loadTasks() {
+    this.taskService
+      .getTasks(this.filterStatus)
+      .subscribe((tasks) => (this.tasks = tasks));
+  }
+
+  changeFilterStatus(n: number) {
+    this.filterStatus = n;
+    this.loadTasks();
   }
 
   addTask() {
@@ -47,6 +97,7 @@ export class HomePage implements OnInit {
     this.taskService.addTask(this.newTaskTitle).subscribe((task) => {
       this.tasks.push(task);
       this.newTaskTitle = '';
+      this.addTaskAlert();
     });
   }
 
@@ -87,4 +138,63 @@ export class HomePage implements OnInit {
     });
     await modal.present();
   }
+
+  // sweet alert 2
+  addTaskAlert() {
+    Swal.fire({
+      heightAuto: false,
+      title: 'Tarea Creada',
+      // text: 'Do you want to continue',
+      icon: 'success',
+      confirmButtonText: 'Nice',
+      theme: 'auto',
+    });
+  }
+
+  deleteTaskAlert(task: Task) {
+    this.isAdmin
+      ? this.deleteTaskAlertAdmin(task)
+      : this.deleteTaskAlertUser(task);
+  }
+
+  async deleteTaskAlertAdmin(task: Task) {
+    const result = await Swal.fire({
+      heightAuto: false,
+      title: 'DELETE TASK',
+      text: 'You really want to delete the task?',
+      icon: 'question',
+      input: 'checkbox',
+      inputPlaceholder: `Send mail to the task owner`,
+      inputValue: 0,
+      confirmButtonText: 'Delete',
+      showDenyButton: true,
+      denyButtonText: 'Cancel',
+      theme: 'auto',
+    });
+    if (result.isConfirmed) {
+      this.deleteTask(task);
+      if (result.value) {
+        this.sendMail();
+      }
+    }
+  }
+
+  deleteTaskAlertUser(task: Task) {
+    Swal.fire({
+      heightAuto: false,
+      title: 'DELETE TASK',
+      text: 'You really want to delete the task?',
+      icon: 'question',
+      confirmButtonText: 'Delete',
+      showDenyButton: true,
+      denyButtonText: 'Cancel',
+      theme: 'auto',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.deleteTask(task);
+      }
+    });
+  }
+
+  sendMail() {}
 }

@@ -61,6 +61,15 @@ export class TaskService {
     });
   }
 
+  // Borrar archivo
+  deleteFile(id: string): Observable<Task> {
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${localStorage.getItem('token')}`,
+    );
+    return this.http.delete<Task>(`${this.apiUrl}/img/${id}`, { headers });
+  }
+
   // Borrar tareas
   deleteTask(id: string): Observable<any> {
     const headers = new HttpHeaders().set(
