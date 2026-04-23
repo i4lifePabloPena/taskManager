@@ -5,6 +5,7 @@ import { ModalController } from '@ionic/angular';
 import { ModalTagComponent } from '../modal-tag/modal-tag.component';
 import { TagService, Tag } from '../../services/tag.service';
 import Swal from 'sweetalert2';
+// import { MailService } from '../../services/mail.service';
 
 @Component({
   selector: 'app-home',
@@ -25,7 +26,7 @@ export class HomePage implements OnInit {
     private authService: AuthService,
     private modalCtrl: ModalController,
     private tagService: TagService,
-    // private swal: Swal,
+    // private mailService: MailService,
   ) {}
 
   logout() {
@@ -149,4 +150,51 @@ export class HomePage implements OnInit {
       theme: 'auto',
     });
   }
+
+  deleteTaskAlert(task: Task) {
+    this.isAdmin
+      ? this.deleteTaskAlertAdmin(task)
+      : this.deleteTaskAlertUser(task);
+  }
+
+  async deleteTaskAlertAdmin(task: Task) {
+    const result = await Swal.fire({
+      heightAuto: false,
+      title: 'DELETE TASK',
+      text: 'You really want to delete the task?',
+      icon: 'question',
+      input: 'checkbox',
+      inputPlaceholder: `Send mail to the task owner`,
+      inputValue: 0,
+      confirmButtonText: 'Delete',
+      showDenyButton: true,
+      denyButtonText: 'Cancel',
+      theme: 'auto',
+    });
+    if (result.isConfirmed) {
+      this.deleteTask(task);
+      if (result.value) {
+        this.sendMail();
+      }
+    }
+  }
+
+  deleteTaskAlertUser(task: Task) {
+    Swal.fire({
+      heightAuto: false,
+      title: 'DELETE TASK',
+      text: 'You really want to delete the task?',
+      icon: 'question',
+      confirmButtonText: 'Delete',
+      showDenyButton: true,
+      denyButtonText: 'Cancel',
+      theme: 'auto',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.deleteTask(task);
+      }
+    });
+  }
+
+  sendMail() {}
 }

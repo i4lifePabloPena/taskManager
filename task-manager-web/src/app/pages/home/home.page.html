@@ -45,10 +45,10 @@
           <ion-chip *ngFor="let tag of task.idTags" color="medium">{{ tag.nameTag }}</ion-chip>
       </ion-label>
       <ion-button color="primary" fill="clear" slot="end" (click)="toggleTask(task)"> <ion-icon name="play-skip-forward-outline"></ion-icon></ion-button>
-      <ion-button color="danger" fill="clear" (click)="deleteTask(task)"> <ion-icon name="trash"> </ion-icon> </ion-button>
+      <ion-button color="danger" fill="clear" (click)="deleteTaskAlert(task)"> <ion-icon name="trash"> </ion-icon> </ion-button>
       <ion-button color="success" fill="clear" (click)="openModal(task)"><ion-icon name="pricetag-outline"></ion-icon></ion-button>
 
     </ion-item>
   </ion-list>
 </ion-content>
-<!-- <ion-button (click)="dispararAlerta()">test</ion-button> -->
+<!-- <ion-button (click)="deleteTaskAlert()">test</ion-button> -->
