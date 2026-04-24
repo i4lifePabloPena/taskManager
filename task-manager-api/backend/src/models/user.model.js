@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
     // New
     role: {type: String, default: "user"},
     name: {type: String},
-    email: {type: String},
+    email: {type: String, required: true, unique: true},
     createdAt: {type: Date}
 });
 // Hashear la contraseña antes de guardar

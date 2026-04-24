@@ -43,7 +43,7 @@ export class SignUpPage implements OnInit {
           },
         });
     } else {
-      alert('Las contraseñas no coinciden.');
+      this.presentToast('Las contraseñas no coinciden', 'danger');
     }
   }
 

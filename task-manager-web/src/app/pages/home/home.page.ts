@@ -19,6 +19,7 @@ export class HomePage implements OnInit {
   isAdmin: boolean = false;
   tags: Tag[] = [];
   filterStatus: number = -1;
+  filterTag: any = '';
 
   constructor(
     private taskService: TaskService,
@@ -63,29 +64,34 @@ export class HomePage implements OnInit {
    * Input: CustomEvent: idTag
    * by: chapuzarro
    */
-  filterTasks(idTag: CustomEvent) {
+  filterTasksChange(idTag: CustomEvent) {
     if (idTag.detail.value != 'All') {
-      this.taskService
-        .getTasks(this.filterStatus)
-        .subscribe((allTasksComplete) => {
-          this.allTasks = allTasksComplete;
-          this.tasks = [];
-          var isTag: boolean;
-          this.allTasks.forEach((task) => {
-            isTag = false;
-            task.idTags?.forEach((tag) => {
-              if (tag._id! == idTag.detail.value) {
-                isTag = true;
-              }
-            });
-            if (isTag) {
-              this.tasks.push(task);
-            }
-          });
-        });
+      this.filterTag = idTag;
+      this.filterTask();
     } else {
       this.loadTasks();
     }
+  }
+
+  filterTask() {
+    this.taskService
+      .getTasks(this.filterStatus)
+      .subscribe((allTasksComplete) => {
+        this.allTasks = allTasksComplete;
+        this.tasks = [];
+        var isTag: boolean;
+        this.allTasks.forEach((task) => {
+          isTag = false;
+          task.idTags?.forEach((tag) => {
+            if (tag._id! == this.filterTag.detail.value) {
+              isTag = true;
+            }
+          });
+          if (isTag) {
+            this.tasks.push(task);
+          }
+        });
+      });
   }
 
   /* loadTasks
@@ -104,6 +110,7 @@ export class HomePage implements OnInit {
   changeFilterStatus(n: number) {
     this.filterStatus = n;
     this.loadTasks();
+    this.filterTask();
   }
 
   /* addTasks
@@ -228,6 +235,9 @@ export class HomePage implements OnInit {
     });
   }
 
+  /* sendMail
+   * Envia un correo, esto deberia estar en el back en "Templates"
+   */
   sendMail(task: Task) {
     this.taskService.sendMail(task._id!).subscribe({
       next: (response) => {
