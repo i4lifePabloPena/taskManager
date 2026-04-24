@@ -4,7 +4,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { ModalController } from '@ionic/angular';
 import { ModalTagComponent } from '../modal-tag/modal-tag.component';
 import { TagService, Tag } from '../../services/tag.service';
-import Swal from 'sweetalert2';
+import Swal, { SweetAlertIcon, SweetAlertInput } from 'sweetalert2';
 
 @Component({
   selector: 'app-home',
@@ -13,13 +13,14 @@ import Swal from 'sweetalert2';
   standalone: false,
 })
 export class HomePage implements OnInit {
-  tasks: Task[] = [];
+  tasks: any[] = [];
   allTasks: Task[] = [];
   newTaskTitle: string = '';
   isAdmin: boolean = false;
   tags: Tag[] = [];
   filterStatus: number = -1;
   filterTag: any = '';
+  uploadingTaskId: string | null = null;
 
   constructor(
     private taskService: TaskService,
@@ -235,6 +236,21 @@ export class HomePage implements OnInit {
     });
   }
 
+  /* persoAlert
+   * Alerta que se personaliza con los parametros introducidos
+   * Input: title: string, text: string, icon: ?
+   */
+  persoAlert(title: string, text: string, icon: SweetAlertIcon) {
+    Swal.fire({
+      heightAuto: false,
+      theme: 'auto',
+      confirmButtonText: 'Oki doki',
+      title: title,
+      text: text,
+      icon: icon,
+    });
+  }
+
   /* sendMail
    * Envia un correo, esto deberia estar en el back en "Templates"
    */
@@ -262,6 +278,45 @@ export class HomePage implements OnInit {
           theme: 'auto',
         });
       },
+    });
+  }
+
+  /* IMG
+   */
+  onFileSelected(event: any, taskId: string) {
+    const file: File = event.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      this.persoAlert('Solo se permiten imágenes', 'danger', 'success');
+      return;
+    }
+    this.uploadingTaskId = taskId;
+    const task = this.tasks.find((t) => t._id === taskId);
+    if (task && task.url) {
+      this.taskService.deleteFile(taskId).subscribe(() => {
+        this.uploadNewFile(taskId, file);
+      });
+    } else {
+      this.uploadNewFile(taskId, file);
+    }
+  }
+  private uploadNewFile(taskId: string, file: File) {
+    this.taskService.uploadFile(taskId, file).subscribe((response) => {
+      const taskIndex = this.tasks.findIndex((t) => t._id === taskId);
+      if (taskIndex > -1) {
+        this.tasks[taskIndex] = response.task;
+      }
+      this.uploadingTaskId = null;
+      this.persoAlert('Imagen subida correctamente', 'success', 'success');
+    });
+  }
+
+  // File Delete
+  async fileDelete(task: Task) {
+    this.taskService.deleteFile(task._id!).subscribe((updatedTask) => {
+      const taskIndex = this.tasks.findIndex((t) => t._id === task._id);
+      this.tasks[taskIndex] = updatedTask;
+      this.persoAlert('File deleted', 'success', 'success');
     });
   }
 }

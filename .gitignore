@@ -1,7 +1,9 @@
 # Perso
 /delete
-./uploads/*
-!./uploads/
+./uploads/
+./delete
+/delete/
+
 
 
 # Angular specific

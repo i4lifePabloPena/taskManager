@@ -1,59 +1,128 @@
 <!-- Header -->
 <ion-header>
   <ion-toolbar>
-    <ion-title>Tareas <ion-icon *ngIf="isAdmin" name="shield-checkmark" color="success"></ion-icon></ion-title><ion-title *ngIf="isAdmin">Admin</ion-title>
-    <ion-button fill="outline" slot="end" [routerLink]="['/tareas']">Ir aTareas</ion-button>
-    <ion-button color="danger" fill="clear" slot="end" (click)="logout()">Cerrar sesión</ion-button>
+    <ion-title>Tareas</ion-title>
+    <ion-title slot="end">
+      Admin
+      <ion-icon *ngIf="isAdmin" name="shield-checkmark" color="success"></ion-icon>
+    </ion-title>
+    <ion-button
+      color="danger"
+      fill="outline"
+      slot="end"
+      (click)="logout()"
+    >Log Out</ion-button>
   </ion-toolbar>
 </ion-header>
 <!-- Body -->
 <ion-content class="ion-padding">
+  
   <!-- addTasks -->
-  <div class="toolNav">      
+  <div class="addTask">      
     <ion-item>
       <ion-input clear-input="true" [(ngModel)]="newTaskTitle" name="newTaskTitle" placeholder="New Task"></ion-input>
-      <ion-button (click)="addTask()">ADD</ion-button>
+      <ion-button
+        (click)="addTask()"
+      >ADD</ion-button>
     </ion-item>
   </div>
+
   <div class="container">
-  <!-- Filters -->
-  <div class="side">
-    <!-- Status -->
-    <ion-select  #statusFilter (ionChange)="changeFilterStatus(statusFilter.value)" toggleIcon="funnel-outline" label="Task Status" interface="popover" label-placement="floating" fill="solid">
-      <ion-select-option value="-1">All</ion-select-option>
-      <ion-select-option value="0">Pendientes</ion-select-option>
-      <ion-select-option value="1">En Progreso</ion-select-option>
-      <ion-select-option value="2">Completadas</ion-select-option>
-    </ion-select>
-    <!-- Tags -->
-    <ion-select 
-    toggleIcon="pricetags-outline"
-    label="Tags"
-    interface="popover"
-    label-placement="floating"
-    fill="solid"
-    (ionChange)="filterTasksChange($event)"
-    >
-    <ion-select-option>All</ion-select-option>
-    <ion-select-option value="{{tag._id}}" *ngFor="let tag of tags">{{tag.nameTag}}</ion-select-option>
+    <!-- Filters -->
+    <div class="side">
+      <!-- Status -->
+      <ion-select
+        #statusFilter
+        (ionChange)="changeFilterStatus(statusFilter.value)"
+        toggleIcon="funnel-outline"
+        label="Task Status"
+        interface="popover"
+        label-placement="floating"
+        fill="solid"
+      >
+        <ion-select-option value="-1">All</ion-select-option>
+        <ion-select-option value="0">Pendientes</ion-select-option>
+        <ion-select-option value="1">En Progreso</ion-select-option>
+        <ion-select-option value="2">Completadas</ion-select-option>
+      </ion-select>
+      <!-- Tags -->
+      <ion-select 
+        toggleIcon="pricetags-outline"
+        label="Tags"
+        interface="popover"
+        label-placement="floating"
+        fill="solid"
+        (ionChange)="filterTasksChange($event)"
+      >
+        <ion-select-option>All</ion-select-option>
+        <ion-select-option value="{{tag._id}}" *ngFor="let tag of tags">{{tag.nameTag}}</ion-select-option>
       </ion-select>
     </div>
-    
+
     <!-- Cards -->
     <div class="main">
       <ion-card *ngFor="let task of tasks">
-      <!-- Title -->
-      <ion-card-header>
-        <ion-label [color]="colorTask(task)">{{ task.title }}</ion-label>
-      </ion-card-header>
-      <!-- Tags -->
-      <ion-card-content>
-        <ion-chip *ngFor="let tag of task.idTags" color="medium">{{ tag.nameTag }}</ion-chip>
-      </ion-card-content>
-      <!-- Buttons -->
-      <ion-button fill="solid" color="primary" (click)="toggleTask(task)"> <ion-icon name="play-skip-forward-outline"></ion-icon></ion-button>
-      <ion-button slot="" fill="solid" color="success" (click)="openModal(task)"><ion-icon name="pricetag-outline"></ion-icon></ion-button>
-      <ion-button fill="solid" color="danger" (click)="deleteTaskAlert(task)"> <ion-icon name="trash"> </ion-icon> </ion-button>
+        <!-- Img -->
+        <img *ngIf="task.url" [src]="task.url" alt="Tarea imagen">
+        <!-- Title -->
+        <ion-card-header>
+          <ion-label [color]="colorTask(task)">{{ task.title }}</ion-label>
+        </ion-card-header>
+        <!-- Tags -->
+        <ion-card-content>
+          <ion-chip *ngFor="let tag of task.idTags" color="medium">{{ tag.nameTag }}</ion-chip>
+        </ion-card-content>
+        <!-- Input de archivo (hide) -->
+        <input 
+          #fileInput
+          type="file" 
+          accept="image/*"
+          (change)="onFileSelected($event, task._id)"
+          />
+          <!-- style="display: none" -->
+        <!-- Buttons -->
+        <ion-footer class="ion-no-border">
+          <!-- Cambiar Estado -->
+          <ion-button
+            fill="solid"
+            color="primary"
+            (click)="toggleTask(task)"
+            size="small"
+          ><ion-icon name="play-skip-forward-outline"></ion-icon></ion-button>
+          <!-- Abrir Modal Tags -->
+          <ion-button
+            slot=""
+            fill="solid"
+            color="success"
+            (click)="openModal(task)"
+            size="small"
+          ><ion-icon name="pricetag-outline"></ion-icon></ion-button>
+          <!-- Delete Task Alert -->
+          <ion-button
+            fill="solid"
+            color="danger"
+            (click)="deleteTaskAlert(task)"
+            size="small"
+          ><ion-icon name="trash"></ion-icon></ion-button>
+          <!-- imgButtons -->
+          <!-- IMG Delete -->
+          <ion-button
+            *ngIf="task.url"
+            color="tertiary"
+            (click)="fileDelete(task)"
+            size="small"
+          ><ion-icon name="close-circle-outline"></ion-icon></ion-button>
+          <!-- Botón upload -->
+          <ion-button 
+            *ngIf="isAdmin"
+            color="primary" 
+            fill="solid" 
+            (click)="fileInput.click()"
+            [disabled]="uploadingTaskId == task._id"
+            size="small"
+          ><ion-icon name="image-outline"></ion-icon>
+          <span *ngIf="uploadingTaskId == task._id">Subiendo...</span></ion-button>
+        </ion-footer>
       </ion-card>
     </div>
   </div>
