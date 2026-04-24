@@ -28,7 +28,29 @@
 }
 
 // Perso
-ion-select {
-  --placeholder-opacity: 1;
-  width: 10%;
+ion-card{
+  float: inline-start;
+  width: 31%;
+}
+
+ion-buttons{
+  float: right;
+}
+
+/* Main column */
+.main {
+  flex: 85%;
+  padding: 10px;
+}
+
+/* Sidebar/left column */
+.side {
+  flex: 15%;
+  padding: 10px;
+}
+
+/* Column container */
+.container {  
+  display: flex;
+  flex-wrap: wrap;
 }

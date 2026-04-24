@@ -5,7 +5,6 @@ import { ModalController } from '@ionic/angular';
 import { ModalTagComponent } from '../modal-tag/modal-tag.component';
 import { TagService, Tag } from '../../services/tag.service';
 import Swal from 'sweetalert2';
-// import { MailService } from '../../services/mail.service';
 
 @Component({
   selector: 'app-home',
@@ -26,9 +25,11 @@ export class HomePage implements OnInit {
     private authService: AuthService,
     private modalCtrl: ModalController,
     private tagService: TagService,
-    // private mailService: MailService,
   ) {}
 
+  /* logout
+   * Cierra sesión
+   */
   logout() {
     this.tasks = [];
     this.newTaskTitle = '';
@@ -47,6 +48,9 @@ export class HomePage implements OnInit {
     this.loadTags();
   };
 
+  /* loadTags()
+   * Carga todas las tags de la DB
+   */
   loadTags() {
     this.tagService.getTags().subscribe((tags) => {
       this.tags = tags;
@@ -54,6 +58,9 @@ export class HomePage implements OnInit {
   }
 
   /* Sistema de filtro por tags
+   * Carga todas las tareas en otro array, vacia el original, compara todas las tags de cada tarea con la introducida,
+   * si coinciden devuelve la tarea al array original.
+   * Input: CustomEvent: idTag
    * by: chapuzarro
    */
   filterTasks(idTag: CustomEvent) {
@@ -81,17 +88,27 @@ export class HomePage implements OnInit {
     }
   }
 
+  /* loadTasks
+   * Carga tareas de la DB filtrando en funcion del valor de "filterStatus", si es -1 carga todas.
+   */
   loadTasks() {
     this.taskService
       .getTasks(this.filterStatus)
       .subscribe((tasks) => (this.tasks = tasks));
   }
 
+  /* changeFilterStatus
+   * Cambia el estado de "filterStatus" y luego ejecuta loadTasks()
+   * Input: number
+   */
   changeFilterStatus(n: number) {
     this.filterStatus = n;
     this.loadTasks();
   }
 
+  /* addTasks
+   * Añade una nueva tarea a la DB, la añade al array "tasks" y ejecuta addTaskAlert()
+   */
   addTask() {
     if (!this.newTaskTitle.trim()) return;
     this.taskService.addTask(this.newTaskTitle).subscribe((task) => {
@@ -101,18 +118,31 @@ export class HomePage implements OnInit {
     });
   }
 
+  /* toggleTask
+   * Cambia el estado de una tarea en la DB y luego actualiza el estado de la tarea
+   * Input: Task
+   */
   toggleTask(task: Task) {
     this.taskService.updateTask(task._id!).subscribe((updatedTask) => {
       task.status = updatedTask.status;
     });
   }
 
+  /* deleteTask
+   * Borra una tarea de la DB
+   * Input: Task
+   */
   deleteTask(task: Task) {
     this.taskService.deleteTask(task._id!).subscribe(() => {
       this.tasks = this.tasks.filter((t) => t._id != task._id);
     });
   }
 
+  /* colorTask
+   * Devuelve un String con el nombre de un color en funcion del estado de la tarea
+   * Input: Task
+   * Output: String
+   */
   colorTask(task: Task) {
     let color: string;
     switch (task.status) {
@@ -128,7 +158,10 @@ export class HomePage implements OnInit {
     return color;
   }
 
-  // modal tags
+  /* openModal
+   * Abre un modal asociado a una tarea, en el cual se puede trabajar con las tags
+   * Input: Task
+   */
   async openModal(task: Task) {
     const modal = await this.modalCtrl.create({
       component: ModalTagComponent,
@@ -144,7 +177,6 @@ export class HomePage implements OnInit {
     Swal.fire({
       heightAuto: false,
       title: 'Tarea Creada',
-      // text: 'Do you want to continue',
       icon: 'success',
       confirmButtonText: 'Nice',
       theme: 'auto',
@@ -174,7 +206,7 @@ export class HomePage implements OnInit {
     if (result.isConfirmed) {
       this.deleteTask(task);
       if (result.value) {
-        this.sendMail();
+        this.sendMail(task);
       }
     }
   }
@@ -196,5 +228,30 @@ export class HomePage implements OnInit {
     });
   }
 
-  sendMail() {}
+  sendMail(task: Task) {
+    this.taskService.sendMail(task._id!).subscribe({
+      next: (response) => {
+        console.log('Correo enviado:', response);
+        Swal.fire({
+          heightAuto: false,
+          title: 'Correo enviado',
+          text: 'Se ha enviado un correo al dueño de la tarea.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+          theme: 'auto',
+        });
+      },
+      error: (error) => {
+        console.error('Error al enviar correo:', error);
+        Swal.fire({
+          heightAuto: false,
+          title: 'Error',
+          text: 'No se pudo enviar el correo.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+          theme: 'auto',
+        });
+      },
+    });
+  }
 }
