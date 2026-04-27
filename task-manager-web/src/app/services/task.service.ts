@@ -98,6 +98,23 @@ export class TaskService {
       'Authorization',
       `Bearer ${localStorage.getItem('token')}`,
     );
-    return this.http.post(`${this.apiUrl}/${taskId}/send-mail`, {}, { headers });
+    return this.http.post(
+      `${this.apiUrl}/${taskId}/send-mail`,
+      {},
+      { headers },
+    );
+  }
+
+  // Eliminar tag de todas las tasks
+  deleteTagOnTasks(tagId: string): Observable<any> {
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${localStorage.getItem('token')}`,
+    );
+    return this.http.put<Task>(
+      `${this.apiUrl}/tag/delete/${tagId}`,
+      {},
+      { headers },
+    );
   }
 }

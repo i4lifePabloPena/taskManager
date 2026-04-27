@@ -46,7 +46,7 @@
         <ion-select-option value="2">Completadas</ion-select-option>
       </ion-select>
       <!-- Tags -->
-      <ion-select 
+      <ion-select
         toggleIcon="pricetags-outline"
         label="Tags"
         interface="popover"
@@ -54,7 +54,7 @@
         fill="solid"
         (ionChange)="filterTasksChange($event)"
       >
-        <ion-select-option>All</ion-select-option>
+        <ion-select-option value="All">All</ion-select-option>
         <ion-select-option value="{{tag._id}}" *ngFor="let tag of tags">{{tag.nameTag}}</ion-select-option>
       </ion-select>
     </div>
@@ -62,40 +62,48 @@
     <!-- Cards -->
     <div class="main">
       <ion-card *ngFor="let task of tasks">
-        <!-- Img -->
-        <img *ngIf="task.url" [src]="task.url" alt="Tarea imagen">
         <!-- Title -->
         <ion-card-header>
           <ion-label [color]="colorTask(task)">{{ task.title }}</ion-label>
         </ion-card-header>
-        <!-- Tags -->
+        <!-- Img -->
+        <!-- IMG Delete -->
+        <ion-button
+        class="delete-image-btn"
+        *ngIf="task.url"
+        (click)="fileDelete(task)"
+        fill="clear"
+        color="tertiary"
+        ><ion-icon name="close-circle-outline"></ion-icon></ion-button>
+        <img *ngIf="task.url" [src]="task.url" alt="Tarea imagen">
+          <!-- Tags -->
         <ion-card-content>
           <ion-chip *ngFor="let tag of task.idTags" color="medium">{{ tag.nameTag }}</ion-chip>
         </ion-card-content>
         <!-- Input de archivo (hide) -->
         <input 
-          #fileInput
-          type="file" 
-          accept="image/*"
-          (change)="onFileSelected($event, task._id)"
-          />
-          <!-- style="display: none" -->
+        #fileInput
+        type="file" 
+        accept="image/*"
+        (change)="onFileSelected($event, task._id)"
+        />
+        <!-- style="display: none" -->
         <!-- Buttons -->
         <ion-footer class="ion-no-border">
           <!-- Cambiar Estado -->
           <ion-button
-            fill="solid"
-            color="primary"
-            (click)="toggleTask(task)"
-            size="small"
+          fill="solid"
+          color="primary"
+          (click)="toggleTask(task)"
+          size="small"
           ><ion-icon name="play-skip-forward-outline"></ion-icon></ion-button>
           <!-- Abrir Modal Tags -->
           <ion-button
-            slot=""
-            fill="solid"
-            color="success"
-            (click)="openModal(task)"
-            size="small"
+          slot=""
+          fill="solid"
+          color="success"
+          (click)="openModal(task)"
+          size="small"
           ><ion-icon name="pricetag-outline"></ion-icon></ion-button>
           <!-- Delete Task Alert -->
           <ion-button
@@ -105,13 +113,6 @@
             size="small"
           ><ion-icon name="trash"></ion-icon></ion-button>
           <!-- imgButtons -->
-          <!-- IMG Delete -->
-          <ion-button
-            *ngIf="task.url"
-            color="tertiary"
-            (click)="fileDelete(task)"
-            size="small"
-          ><ion-icon name="close-circle-outline"></ion-icon></ion-button>
           <!-- Botón upload -->
           <ion-button 
             *ngIf="isAdmin"

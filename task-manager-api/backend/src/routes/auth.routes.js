@@ -13,12 +13,12 @@ router.post('/register', async (req, res) => {
         const { username, password, role, name, email } = req.body;
         const user = new User({ username, password, role, name, email, createdAt: new Date()});
         if (!emailRegex.test(user.email)) {
-            return res.status(500).json({ error: "Correo no válido" });
+            return res.status(500).json({ error: "Invalid mail" });
         }
         await user.save();
-        res.status(201).json({ message: 'Usuario creado' });
+        res.status(201).json({ message: 'Account successfully created' });
     } catch (error) {
-      res.status(400).json({ error: 'El usuario ya existe' });
+      res.status(400).json({ error: 'Username already in use' });
     }
 });
 // Inicio de sesión
@@ -27,12 +27,12 @@ router.post('/login', async (req, res) => {
         const { username, password } = req.body;
         const user = await User.findOne({ username });
         if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(401).json({ error: 'Credencialesincorrectas' });
+            return res.status(401).json({ error: 'Incorrect User/Password' });
         }
         const token = jwt.sign({ userId: user._id, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
         res.json({ token });
     } catch (error) {
-        res.status(500).json({ error: 'Error en el servidor' });
+        res.status(500).json({ error: 'Server error' });
     }
 });
 module.exports = router;

@@ -19,7 +19,7 @@ export class HomePage implements OnInit {
   isAdmin: boolean = false;
   tags: Tag[] = [];
   filterStatus: number = -1;
-  filterTag: any = '';
+  filterTag: any = 'All';
   uploadingTaskId: string | null = null;
 
   constructor(
@@ -66,33 +66,34 @@ export class HomePage implements OnInit {
    * by: chapuzarro
    */
   filterTasksChange(idTag: CustomEvent) {
-    if (idTag.detail.value != 'All') {
-      this.filterTag = idTag;
-      this.filterTask();
-    } else {
-      this.loadTasks();
-    }
+    this.filterTag = idTag;
+    this.filterTask();
   }
 
   filterTask() {
-    this.taskService
-      .getTasks(this.filterStatus)
-      .subscribe((allTasksComplete) => {
-        this.allTasks = allTasksComplete;
-        this.tasks = [];
-        var isTag: boolean;
-        this.allTasks.forEach((task) => {
-          isTag = false;
-          task.idTags?.forEach((tag) => {
-            if (tag._id! == this.filterTag.detail.value) {
-              isTag = true;
+    console.log(this.filterTag.detail.value);
+    if (this.filterTag.detail.value != 'All') {
+      this.taskService
+        .getTasks(this.filterStatus)
+        .subscribe((allTasksComplete) => {
+          this.allTasks = allTasksComplete;
+          this.tasks = [];
+          var isTag: boolean;
+          this.allTasks.forEach((task) => {
+            isTag = false;
+            task.idTags?.forEach((tag) => {
+              if (tag._id! == this.filterTag.detail.value) {
+                isTag = true;
+              }
+            });
+            if (isTag) {
+              this.tasks.push(task);
             }
           });
-          if (isTag) {
-            this.tasks.push(task);
-          }
         });
-      });
+    } else {
+      this.loadTasks();
+    }
   }
 
   /* loadTasks
@@ -178,6 +179,10 @@ export class HomePage implements OnInit {
       },
     });
     await modal.present();
+    modal.onDidDismiss().then(() => {
+      this.loadTasks();
+      this.loadTags();
+    });
   }
 
   // sweet alert 2
@@ -263,17 +268,6 @@ export class HomePage implements OnInit {
           title: 'Correo enviado',
           text: 'Se ha enviado un correo al dueño de la tarea.',
           icon: 'success',
-          confirmButtonText: 'OK',
-          theme: 'auto',
-        });
-      },
-      error: (error) => {
-        console.error('Error al enviar correo:', error);
-        Swal.fire({
-          heightAuto: false,
-          title: 'Error',
-          text: 'No se pudo enviar el correo.',
-          icon: 'error',
           confirmButtonText: 'OK',
           theme: 'auto',
         });

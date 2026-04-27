@@ -28,7 +28,7 @@ const upload = multer({
         if (extype) {
             return cb(null, true);
         } else {
-            cb(new Error('Solo jpeg, jpg, png, gif'));
+            cb(new Error('Only jpeg, jpg, png, gif formats'));
         }
     }
 });
@@ -215,6 +215,22 @@ router.post('/tasks/:id/send-mail', authMiddleware, async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ error: 'Error al enviar correo' });
+    }
+});
+
+router.put("/tasks/tag/delete/:idTag", authMiddleware, async(req, res) => {
+    try {
+        if (req.userRole != "admin") {
+           return res.status(401).json({ error: "Acceso denegado" });
+       }
+        const { idTag } = req.params;
+        const query = { idTags: idTag };
+
+        const result = await Task.updateMany(query, { $pull: { idTags: idTag } });
+
+        res.json({ message: 'Tag eliminada de las tareas' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar la tag de las tasks' });
     }
 });
 

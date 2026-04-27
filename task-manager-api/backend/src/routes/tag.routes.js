@@ -8,12 +8,12 @@ const Tag = require("../models/tagModel");
 router.post('/tag', authMiddleware, async(req, res) => {
     try{
         const { nameTag } = req.body;
-        if (!nameTag) return res.status(400).json({Error: "nameTag requerida"});
+        if (!nameTag) return res.status(400).json({Error: "Name tag required"});
         const tag = new Tag({nameTag});
         await tag.save();
         res.json(tag);
     } catch (error) {
-        res.status(400).json({Error: "Ya existe esa tag"});
+        res.status(400).json({Error: "Name tag already exists"});
     }
 });
 module.exports = router;
@@ -24,7 +24,7 @@ router.get('/tag', authMiddleware, async (req, res) =>{
         const tags = await Tag.find();
         res.json(tags);
     }catch (error){
-        res.status(500).json({ Error: "Error al obtener los tags"});
+        res.status(500).json({ Error: "Error to obtain tags"});
     }
 });
 
@@ -32,15 +32,15 @@ router.get('/tag', authMiddleware, async (req, res) =>{
 router.delete('/tag/:id', authMiddleware, async(req, res) =>{
     try{
         if (req.userRole != "admin") {
-            return res.status(401).json({ error: "Acceso denegado" });
+            return res.status(401).json({ error: "Access denegated" });
         }
         const {id} = req.params;
         let query ={_id: id};
         const tag = await Tag.findOne(query);
-        if (!tag){return res.status(404).json({ Error: "La tag no existe" })};
+        if (!tag){return res.status(404).json({ Error: "Tag not found" })};
         await Tag.findByIdAndDelete(id);
-        res.json({response: "Tag eliminada"})
+        res.json({response: "Tag deleted successfully"})
     }catch{
-        res.status(500).json({Error: "Error al eleminar el tag"});
+        res.status(500).json({Error: "Error to delete tag"});
     }
 });

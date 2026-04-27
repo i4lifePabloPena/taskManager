@@ -47,6 +47,12 @@ export class ModalTagComponent implements OnInit {
       });
   }
 
+  deleteTagOnTasks(tag: Tag) {
+    this.taskService.deleteTagOnTasks(tag._id!).subscribe((updatedTask) => {
+      this.task.idTags = updatedTask.idTags;
+    });
+  }
+
   createTag() {
     this.tagService.createTag(this.newTagName.trim()).subscribe((newTag) => {
       this.tags.push(newTag);
@@ -62,13 +68,14 @@ export class ModalTagComponent implements OnInit {
     this.tagService.deleteTag(tag._id!).subscribe(() => {
       this.tags = this.tags.filter((keepedTags) => keepedTags._id != tag._id);
     });
+    this.deleteTagOnTasks(tag);
   }
 
-  deleteTaskAlertUser(tag: Tag) {
+  deleteTagAlertUser(tag: Tag) {
     Swal.fire({
       heightAuto: false,
-      title: 'DELETE TASK',
-      text: 'You really want to delete the task?',
+      title: 'DELETE TAG',
+      text: 'You really want to delete the tag?',
       icon: 'question',
       confirmButtonText: 'Delete',
       showDenyButton: true,
