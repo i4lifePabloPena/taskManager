@@ -12,5 +12,7 @@
     <ion-input [(ngModel)]="password" name="password" type="password" placeholder="Contraseña"></ion-input>
   </ion-item>
   <ion-button type="button" (click)="login()">Ingresar</ion-button>
-  <ion-button [routerLink]="['/sign-up']">Registrarse</ion-button>
+  <ion-button
+    (click)="signUpModal()"
+  >Sign Up</ion-button>
 </ion-content>

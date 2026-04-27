@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>SignUp</ion-title>
+      <ion-button
+        (click)="cancel()"
+        slot="end"
+        [strong]="true"
+        >Cancel</ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Username -->
+  <ion-item>
+    <ion-input
+    [(ngModel)]="username"
+    name="username"
+    placeholder="User"
+    ></ion-input>
+  </ion-item>
+  <!-- Password -->
+  <ion-item>
+    <ion-input
+    [(ngModel)]="password"
+    name="password"
+    type="password"
+    placeholder="Password"
+    ></ion-input>
+  </ion-item>
+  <!-- Confirm Password -->
+  <ion-item>
+    <ion-input
+    [(ngModel)]="confirmPassword"
+    name="confirmPassword"
+    type="password"
+    placeholder="Confirm Password"
+    ></ion-input>
+  </ion-item>
+  <!-- Name -->
+  <ion-item>
+    <ion-input
+    [(ngModel)]="name"
+    name="name"
+    placeholder="Name"
+    ></ion-input>
+  </ion-item>
+  <!-- Mail -->
+  <ion-item>
+    <ion-input
+    type="email"
+    inputmode="email"
+    name="email"
+    placeholder="Email"
+    errorText="Invalid email"
+    [(ngModel)]="email"
+    required="true"
+    ></ion-input>
+  </ion-item>
+  <ion-button
+    type="button"
+    (click)="register()"
+  >Registrarse</ion-button>
+</ion-content>
