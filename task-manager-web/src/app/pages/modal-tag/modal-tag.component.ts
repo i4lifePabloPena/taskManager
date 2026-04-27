@@ -3,6 +3,7 @@ import { ModalController } from '@ionic/angular';
 import { TaskService, Task } from '../../services/task.service';
 import { TagService, Tag } from '../../services/tag.service';
 import { AuthService } from 'src/app/services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-modal-tag',
@@ -46,6 +47,12 @@ export class ModalTagComponent implements OnInit {
       });
   }
 
+  deleteTagOnTasks(tag: Tag) {
+    this.taskService.deleteTagOnTasks(tag._id!).subscribe((updatedTask) => {
+      this.task.idTags = updatedTask.idTags;
+    });
+  }
+
   createTag() {
     this.tagService.createTag(this.newTagName.trim()).subscribe((newTag) => {
       this.tags.push(newTag);
@@ -60,6 +67,24 @@ export class ModalTagComponent implements OnInit {
   deleteTag(tag: Tag) {
     this.tagService.deleteTag(tag._id!).subscribe(() => {
       this.tags = this.tags.filter((keepedTags) => keepedTags._id != tag._id);
+    });
+    this.deleteTagOnTasks(tag);
+  }
+
+  deleteTagAlertUser(tag: Tag) {
+    Swal.fire({
+      heightAuto: false,
+      title: 'DELETE TAG',
+      text: 'You really want to delete the tag?',
+      icon: 'question',
+      confirmButtonText: 'Delete',
+      showDenyButton: true,
+      denyButtonText: 'Cancel',
+      theme: 'auto',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.deleteTag(tag);
+      }
     });
   }
 }

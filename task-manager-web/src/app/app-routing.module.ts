@@ -19,12 +19,12 @@ const routes: Routes = [
     loadChildren: () =>
       import('./pages/login/login.module').then((m) => m.LoginPageModule),
   },
-  {
-    path: 'tareas',
-    loadChildren: () =>
-      import('./pages/tareas/tareas.module').then((m) => m.TareasPageModule),
-    canActivate: [AuthGuard],
-  },
+  // {
+  //   path: 'tareas',
+  //   loadChildren: () =>
+  //     import('./pages/tareas/tareas.module').then((m) => m.TareasPageModule),
+  //   canActivate: [AuthGuard],
+  // },
   {
     path: 'sign-up',
     loadChildren: () =>
