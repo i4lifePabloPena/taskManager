@@ -302,6 +302,7 @@ export class HomePage implements OnInit {
       }
       this.uploadingTaskId = null;
       this.persoAlert('Imagen subida correctamente', 'success', 'success');
+      this.loadTasks();
     });
   }
 
@@ -311,6 +312,7 @@ export class HomePage implements OnInit {
       const taskIndex = this.tasks.findIndex((t) => t._id === task._id);
       this.tasks[taskIndex] = updatedTask;
       this.persoAlert('File deleted', 'success', 'success');
+      this.loadTasks();
     });
   }
 }
