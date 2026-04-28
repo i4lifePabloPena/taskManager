@@ -55,7 +55,7 @@ export class SignUpModalComponent implements OnInit {
     Swal.fire({
       heightAuto: false,
       theme: 'auto',
-      position: 'top-end',
+      position: 'bottom',
       toast: true,
       showConfirmButton: false,
       timer: 2000,

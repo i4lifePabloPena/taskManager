@@ -51,7 +51,7 @@ export class AuthService {
     localStorage.removeItem('token');
     this.authState.next(false);
     this.userRole.next('');
-    this.router.navigate(['/login']);
+    this.router.navigate(['/start']);
   }
   isAuthenticated() {
     return this.authState.asObservable();
