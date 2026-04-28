@@ -71,6 +71,19 @@ export class ModalTagComponent implements OnInit {
     this.deleteTagOnTasks(tag);
   }
 
+  /* extractTag
+   * Elimina la tag introducida de una task manteniendo el resto
+   * Input: Tag
+   */
+  extractTag(inTag: Tag) {
+    this.task.idTags!.forEach((tag) => {
+      if (tag != inTag) {
+        this.selectedTagIds.push(tag._id!);
+      }
+    });
+    this.assignTag();
+  }
+
   deleteTagAlertUser(tag: Tag) {
     Swal.fire({
       heightAuto: false,

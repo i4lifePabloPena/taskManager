@@ -114,9 +114,10 @@
           ><ion-icon name="trash"></ion-icon></ion-button>
           <!-- imgButtons -->
           <!-- Botón upload -->
-          <ion-button 
+          <ion-button
+            class="uploadImageBtn" 
             *ngIf="isAdmin"
-            color="primary" 
+            color="tertiary" 
             fill="solid" 
             (click)="fileInput.click()"
             [disabled]="uploadingTaskId == task._id"

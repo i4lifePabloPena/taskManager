@@ -16,9 +16,11 @@
   <ion-item>
     <ion-label>
       Tags actuales:
-      <ion-chip *ngFor="let tag of task.idTags" color="primary">
-        {{ tag.nameTag }}
-      </ion-chip>
+      <ion-chip
+      *ngFor="let tag of task.idTags"
+      color="primary"
+      (click)="extractTag(tag)"
+      >{{ tag.nameTag }}<ion-icon name="close-circle"></ion-icon></ion-chip>
     </ion-label>
   </ion-item>
 
@@ -47,6 +49,4 @@
       <ion-label>{{ tag.nameTag }}</ion-label>
     </ion-item>
   </ion-list>
-
-
 </ion-content>
