@@ -1,18 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { TaskService, Task } from '../../services/task.service';
-import { AuthService } from 'src/app/services/auth.service';
-import { ModalController } from '@ionic/angular';
-import { ModalTagComponent } from '../modal-tag/modal-tag.component';
-import { TagService, Tag } from '../../services/tag.service';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
+import { ModalTagComponent } from '../modal-tag/modal-tag.component';
+import { ModalController } from '@ionic/angular';
+import { AuthService } from 'src/app/services/auth.service';
+import { Tag, TagService } from 'src/app/services/tag.service';
+import { TaskService, Task } from 'src/app/services/task.service';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: 'home.page.html',
-  styleUrls: ['home.page.scss'],
+  selector: 'app-admin-panel',
+  templateUrl: './admin-panel.page.html',
+  styleUrls: ['./admin-panel.page.scss'],
   standalone: false,
 })
-export class HomePage implements OnInit {
+export class AdminPanelPage implements OnInit {
   tasks: any[] = [];
   newTaskTitle: string = '';
   isAdmin: boolean = false;
@@ -20,23 +20,12 @@ export class HomePage implements OnInit {
   filterStatus: number = -1;
   filterTag: any = 'All';
   uploadingTaskId: string | null = null;
-
   constructor(
     private taskService: TaskService,
     private authService: AuthService,
     private modalCtrl: ModalController,
     private tagService: TagService,
   ) {}
-
-  /* logout
-   * Cierra sesión
-   */
-  logout() {
-    this.tasks = [];
-    this.newTaskTitle = '';
-    this.isAdmin = false;
-    this.authService.logout();
-  }
 
   ngOnInit() {
     this.authService.isAdmin().subscribe((role) => {
@@ -83,7 +72,7 @@ export class HomePage implements OnInit {
    */
   loadTasks() {
     this.taskService
-      .getTasks(this.filterStatus)
+      .getAllTasks(this.filterStatus)
       .subscribe((tasks) => (this.tasks = tasks));
   }
 

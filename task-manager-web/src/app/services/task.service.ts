@@ -30,6 +30,17 @@ export class TaskService {
     return this.http.get<Task[]>(url, { headers });
   }
 
+  // Obtener todas las tareas
+  getAllTasks(status?: number): Observable<Task[]> {
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${localStorage.getItem('token')}`,
+    );
+    let url = this.apiUrl + '/all';
+    url += status != -1 ? `?status=${status}` : '?status=1&status=2&status=0';
+    return this.http.get<Task[]>(url, { headers });
+  }
+
   // Añadir tareas
   addTask(title: string): Observable<Task> {
     const headers = new HttpHeaders().set(

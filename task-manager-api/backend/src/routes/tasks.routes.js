@@ -13,11 +13,26 @@ const fs = require('fs');
 router.get('/tasks', authMiddleware, async (req, res) => {
     try {
         let query = { status: req.query.status };
-        if (req.userRole != 'admin') {
+        if (true) { // req.userRole != 'admin'
             query.userId = req.userId;
         }
         const tasks = await Task.find(query).populate('idTags');
         res.json(tasks);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener tareas'});
+    }
+});
+
+// Obtener las tareas requiere de un query con el estado de la tarea
+router.get('/tasks/all', authMiddleware, async (req, res) => {
+    try {
+        let query = { status: req.query.status };
+        if (req.userRole == 'admin') {
+            const tasks = await Task.find(query).populate('idTags');
+            res.json(tasks);
+        } else{
+            return res.status(401).json({ error: 'Acceso denegado' })
+        }
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener tareas'});
     }

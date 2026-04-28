@@ -1,43 +1,20 @@
-<!-- Header -->
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title slot="start">Tareas</ion-title>
     <ion-button
-    float="float"
-    color="warning"
+    color="dark"
     fill="clear"
-    [routerLink]="['/admin-panel']"
-    *ngIf="isAdmin"
-    >
-    <ion-title slot="end">
-      Admin
-      <ion-icon name="shield-checkmark" color="success"></ion-icon>
-    </ion-title>
-  </ion-button>
+    [routerLink]="['/home']"
+  ><ion-title><ion-icon name="shield-checkmark" color="success"></ion-icon>Admin Panel</ion-title></ion-button>
+
   <ion-button
-    color="danger"
-    fill="outline"
-    slot="end"
-    (click)="logout()"
-    size="small"
-  >Log Out</ion-button>
+  slot="end"
+  [routerLink]="['/home']"
+  >Go Back</ion-button>
   </ion-toolbar>
-
 </ion-header>
-
 
 <!-- Body -->
 <ion-content class="ion-padding">
-  <!-- addTasks -->
-  <div class="addTask">      
-    <ion-item>
-      <ion-input clear-input="true" [(ngModel)]="newTaskTitle" name="newTaskTitle" placeholder="New Task"></ion-input>
-      <ion-button
-        (click)="addTask()"
-      >ADD</ion-button>
-    </ion-item>
-  </div>
-
   <div class="container">
     <!-- Filters -->
     <div class="side">
@@ -82,10 +59,17 @@
         </ion-card-header>
         <!-- Img -->
         <img *ngIf="task.url" [src]="task.url" alt="Tarea imagen">
-          <!-- Tags -->
+        <!-- Tags -->
         <ion-card-content>
           <ion-chip *ngFor="let tag of task.idTags" color="medium">{{ tag.nameTag }}</ion-chip>
         </ion-card-content>
+        <!-- Input de archivo (hide) -->
+        <input 
+        #fileInput
+        type="file" 
+        accept="image/*"
+        (change)="onFileSelected($event, task._id)"
+        />
         <!-- Buttons -->
         <ion-footer class="ion-no-border">
           <!-- Cambiar Estado -->
@@ -105,13 +89,34 @@
           ><ion-icon name="pricetag-outline"></ion-icon></ion-button>
           <!-- Delete Task Alert -->
           <ion-button
-            fill="solid"
-            color="danger"
-            (click)="deleteTaskAlert(task)"
-            size="small"
+          fill="solid"
+          color="danger"
+          (click)="deleteTaskAlert(task)"
+          size="small"
           ><ion-icon name="trash"></ion-icon></ion-button>
+          <!-- imgButtons -->
+          <!-- Botón upload -->
+          <ion-button
+          class="uploadImageBtn" 
+          *ngIf="isAdmin"
+          color="tertiary" 
+          fill="solid" 
+          (click)="fileInput.click()"
+          [disabled]="uploadingTaskId == task._id"
+          size="small"
+          ><ion-icon name="image-outline"></ion-icon>
+          <span *ngIf="uploadingTaskId == task._id">Subiendo...</span></ion-button>
+          <!-- IMG Delete -->
+          <ion-button
+          class="delete-image-btn"
+          *ngIf="task.url"
+          (click)="fileDelete(task)"
+          fill="clear"
+          color="tertiary"
+          ><ion-icon name="close-circle-outline"></ion-icon></ion-button>
         </ion-footer>
       </ion-card>
     </div>
   </div>
 </ion-content>
+
