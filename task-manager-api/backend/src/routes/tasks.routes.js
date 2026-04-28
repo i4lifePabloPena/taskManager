@@ -8,6 +8,21 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+
+// Obtener las tareas requiere de un query con el estado de la tarea
+router.get('/tasks', authMiddleware, async (req, res) => {
+    try {
+        let query = { status: req.query.status };
+        if (req.userRole != 'admin') {
+            query.userId = req.userId;
+        }
+        const tasks = await Task.find(query).populate('idTags');
+        res.json(tasks);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener tareas'});
+    }
+});
+
 // multer config
 const uploadDir = path.join(__dirname, '../../uploads');
 
@@ -33,19 +48,6 @@ const upload = multer({
     }
 });
 
-// Obtener las tareas requiere de un query con el estado de la tarea
-router.get('/tasks', authMiddleware, async (req, res) => {
-    try {
-        let query = { status: req.query.status };
-        if (req.userRole != 'admin') {
-            query.userId = req.userId;
-        }
-        const tasks = await Task.find(query).populate('idTags');
-        res.json(tasks);
-    } catch (error) {
-        res.status(500).json({ error: 'Error al obtener tareas'});
-    }
-});
 
 
 // Subir archivo

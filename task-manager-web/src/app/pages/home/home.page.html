@@ -52,7 +52,7 @@
         interface="popover"
         label-placement="floating"
         fill="solid"
-        (ionChange)="filterTasksChange($event)"
+        (ionChange)="filterTask($event)"
       >
         <ion-select-option value="All">All</ion-select-option>
         <ion-select-option value="{{tag._id}}" *ngFor="let tag of tags">{{tag.nameTag}}</ion-select-option>

@@ -77,9 +77,7 @@ export class ModalTagComponent implements OnInit {
    */
   extractTag(inTag: Tag) {
     this.task.idTags!.forEach((tag) => {
-      if (tag != inTag) {
-        this.selectedTagIds.push(tag._id!);
-      }
+      if (tag != inTag) this.selectedTagIds.push(tag._id!);
     });
     this.assignTag();
   }

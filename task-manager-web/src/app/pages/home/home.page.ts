@@ -14,7 +14,6 @@ import Swal, { SweetAlertIcon } from 'sweetalert2';
 })
 export class HomePage implements OnInit {
   tasks: any[] = [];
-  allTasks: Task[] = [];
   newTaskTitle: string = '';
   isAdmin: boolean = false;
   tags: Tag[] = [];
@@ -59,41 +58,24 @@ export class HomePage implements OnInit {
     });
   }
 
-  /* Sistema de filtro por tags
-   * Carga todas las tareas en otro array, vacia el original, compara todas las tags de cada tarea con la introducida,
-   * si coinciden devuelve la tarea al array original.
+  /* filterTask
+   * Filtra las tareas en función de las tags y el "status" de la tarea
    * Input: CustomEvent: idTag
-   * by: chapuzarro
    */
-  filterTasksChange(idTag: CustomEvent) {
-    this.filterTag = idTag;
-    this.filterTask();
-  }
 
-  filterTask() {
-    console.log(this.filterTag.detail.value);
-    if (this.filterTag.detail.value != 'All') {
-      this.taskService
-        .getTasks(this.filterStatus)
-        .subscribe((allTasksComplete) => {
-          this.allTasks = allTasksComplete;
-          this.tasks = [];
-          var isTag: boolean;
-          this.allTasks.forEach((task) => {
-            isTag = false;
-            task.idTags?.forEach((tag) => {
-              if (tag._id! == this.filterTag.detail.value) {
-                isTag = true;
-              }
-            });
-            if (isTag) {
-              this.tasks.push(task);
-            }
-          });
+  filterTask(idTag: CustomEvent) {
+    this.filterTag = idTag;
+    if (this.filterTag.detail.value == 'All') return this.loadTasks();
+    this.taskService.getTasks(this.filterStatus).subscribe((allTasks) => {
+      this.tasks = [];
+      allTasks.forEach((task) => {
+        task.idTags?.forEach((tag) => {
+          if (tag._id! == this.filterTag.detail.value) {
+            this.tasks.push(task);
+          }
         });
-    } else {
-      this.loadTasks();
-    }
+      });
+    });
   }
 
   /* loadTasks
@@ -112,7 +94,7 @@ export class HomePage implements OnInit {
   changeFilterStatus(n: number) {
     this.filterStatus = n;
     this.loadTasks();
-    this.filterTask();
+    this.filterTask(this.filterTag);
   }
 
   /* addTasks
