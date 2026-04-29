@@ -80,8 +80,27 @@
         <!-- Title -->
         <ion-card-header>
           <ion-toolbar class="test">
-            <ion-label [color]="colorTask(task)">{{ task.title }}</ion-label>
-            <ion-chip outline="true" [color]="colorTask(task)" slot="end">{{statusChip(task)}}</ion-chip>
+            <ion-label [color]="colorTask(task)" slot="start">{{ task.title }}</ion-label>
+            <ion-chip outline="true" [color]="colorTask(task)">{{statusChip(task)}}</ion-chip>
+
+            <!-- Calendar -->
+            <ion-datetime-button slot="end"  datetime="datetime"></ion-datetime-button>
+            
+            <ion-popover keepContentsMounted="true">
+             <ng-template>
+                <ion-datetime
+                  #dueDate
+                  (ionChange)="dateUpdate(task, dueDate.value)"
+                  presentation="date"
+                  id="datetime"
+                  showDefaultButtons="true"
+                >
+                </ion-datetime>
+            </ng-template>              
+            </ion-popover>
+
+            <!-- (click)="dateUpdate(task, 01/01/2000)" -->
+            <ion-chip outline="true" color="dark" slot="end" disabled="true">{{task.limitDate}}</ion-chip>
           </ion-toolbar>
         </ion-card-header>
         <!-- Img -->

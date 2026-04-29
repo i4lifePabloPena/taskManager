@@ -66,7 +66,7 @@ export class TrashPage implements OnInit {
   filterTask(idTag: any) {
     this.filterTag = idTag;
     if (this.filterTag.detail.value == 'All') return this.loadTasks();
-    this.taskService.getTasks(this.filterStatus).subscribe((allTasks) => {
+    this.taskService.getAllTasks(this.filterStatus).subscribe((allTasks) => {
       this.tasks = [];
       allTasks.forEach((task) => {
         if (task.trash) {
@@ -85,7 +85,7 @@ export class TrashPage implements OnInit {
    */
   loadTasks() {
     this.tasks = [];
-    this.taskService.getTasks(this.filterStatus).subscribe((tasks) => {
+    this.taskService.getAllTasks(this.filterStatus).subscribe((tasks) => {
       tasks.forEach((task) => {
         if (task.trash) {
           this.tasks.push(task);

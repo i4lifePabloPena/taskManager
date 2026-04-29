@@ -5,6 +5,7 @@ import { ModalController } from '@ionic/angular';
 import { ModalTagComponent } from '../modal-tag/modal-tag.component';
 import { TagService, Tag } from '../../services/tag.service';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
+import { format, parseISO } from 'date-fns';
 
 @Component({
   selector: 'app-home',
@@ -141,6 +142,19 @@ export class HomePage implements OnInit {
     });
   }
 
+  dateUpdate(task: Task, dueDate: any) {
+    console.log(task._id);
+    console.log(dueDate);
+    const formattedDate = format(parseISO(dueDate), 'date');
+    console.log(formattedDate);
+
+    this.taskService
+      .dateUpdate(task._id!, limitDate)
+      .subscribe((updatedTask) => {
+        task.status = updatedTask.status;
+      });
+  }
+
   /* deleteTask
    * marca una tarea para eliminar
    * Input: Task
@@ -149,7 +163,6 @@ export class HomePage implements OnInit {
     this.taskService.trashUpdate(task._id!).subscribe(() => {
       this.tasks = this.tasks.filter((t) => t._id != task._id);
     });
-    console.log(task);
   }
 
   /* colorTask

@@ -12,6 +12,7 @@ export interface Task {
   url?: string;
   idTags?: Tag[];
   trash: boolean;
+  limitDate: Date;
 }
 @Injectable({
   providedIn: 'root',
@@ -68,6 +69,16 @@ export class TaskService {
     );
     let url = this.apiUrl + '/trash';
     return this.http.put<Task>(`${url}/${id}`, {}, { headers });
+  }
+
+  // dateUpdate
+  dateUpdate(id: string, limitDate: Date): Observable<Task> {
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${localStorage.getItem('token')}`,
+    );
+    let url = this.apiUrl + '/date';
+    return this.http.post<Task>(`${url}/${id}`, { limitDate }, { headers });
   }
 
   // Subir archivo
