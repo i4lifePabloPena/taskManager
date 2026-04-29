@@ -13,7 +13,7 @@ import Swal, { SweetAlertIcon } from 'sweetalert2';
   standalone: false,
 })
 export class HomePage implements OnInit {
-  tasks: any[] = [];
+  tasks: Task[] = [];
   newTaskTitle: string = '';
   isAdmin: boolean = false;
   tags: Tag[] = [];
@@ -63,28 +63,51 @@ export class HomePage implements OnInit {
    * Input: CustomEvent: idTag
    */
 
-  filterTask(idTag: CustomEvent) {
+  filterTask(idTag: any) {
     this.filterTag = idTag;
     if (this.filterTag.detail.value == 'All') return this.loadTasks();
     this.taskService.getTasks(this.filterStatus).subscribe((allTasks) => {
       this.tasks = [];
       allTasks.forEach((task) => {
-        task.idTags?.forEach((tag) => {
-          if (tag._id! == this.filterTag.detail.value) {
-            this.tasks.push(task);
-          }
-        });
+        if (!task.trash) {
+          task.idTags?.forEach((tag) => {
+            if (tag._id! == this.filterTag.detail.value) {
+              this.tasks.push(task);
+            }
+          });
+        }
       });
     });
   }
+
+  // filterTask(eventIdTag: any) {
+  //   this.loadTasks(); // <------ Problema
+
+  //   if (eventIdTag.detail.value != 'All') {
+  //     const tempTask: Task[] = this.tasks;
+  //     this.tasks = [];
+  //     tempTask.forEach((task) => {
+  //       task.idTags?.forEach((tag) => {
+  //         if (tag._id == eventIdTag.detail.value) {
+  //           this.tasks.push(task);
+  //         }
+  //       });
+  //     });
+  //   }
+  // }
 
   /* loadTasks
    * Carga tareas de la DB filtrando en funcion del valor de "filterStatus", si es -1 carga todas.
    */
   loadTasks() {
-    this.taskService
-      .getTasks(this.filterStatus)
-      .subscribe((tasks) => (this.tasks = tasks));
+    this.tasks = [];
+    this.taskService.getTasks(this.filterStatus).subscribe((tasks) => {
+      tasks.forEach((task) => {
+        if (!task.trash) {
+          this.tasks.push(task);
+        }
+      });
+    });
   }
 
   /* changeFilterStatus
@@ -93,7 +116,6 @@ export class HomePage implements OnInit {
    */
   changeFilterStatus(n: number) {
     this.filterStatus = n;
-    this.loadTasks();
     this.filterTask(this.filterTag);
   }
 
@@ -120,13 +142,14 @@ export class HomePage implements OnInit {
   }
 
   /* deleteTask
-   * Borra una tarea de la DB
+   * marca una tarea para eliminar
    * Input: Task
    */
   deleteTask(task: Task) {
-    this.taskService.deleteTask(task._id!).subscribe(() => {
+    this.taskService.trashUpdate(task._id!).subscribe(() => {
       this.tasks = this.tasks.filter((t) => t._id != task._id);
     });
+    console.log(task);
   }
 
   /* colorTask
@@ -195,38 +218,10 @@ export class HomePage implements OnInit {
   }
 
   deleteTaskAlert(task: Task) {
-    this.isAdmin
-      ? this.deleteTaskAlertAdmin(task)
-      : this.deleteTaskAlertUser(task);
-  }
-
-  async deleteTaskAlertAdmin(task: Task) {
-    const result = await Swal.fire({
-      heightAuto: false,
-      title: 'DELETE TASK',
-      text: 'You really want to delete the task?',
-      icon: 'question',
-      input: 'checkbox',
-      inputPlaceholder: `Send mail to the task owner`,
-      inputValue: 0,
-      confirmButtonText: 'Delete',
-      showDenyButton: true,
-      denyButtonText: 'Cancel',
-      theme: 'auto',
-    });
-    if (result.isConfirmed) {
-      this.deleteTask(task);
-      if (result.value) {
-        this.sendMail(task);
-      }
-    }
-  }
-
-  deleteTaskAlertUser(task: Task) {
     Swal.fire({
       heightAuto: false,
       title: 'DELETE TASK',
-      text: 'You really want to delete the task?',
+      text: 'The task will be moved to the trash',
       icon: 'question',
       confirmButtonText: 'Delete',
       showDenyButton: true,

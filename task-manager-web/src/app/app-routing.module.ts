@@ -22,6 +22,10 @@ const routes: Routes = [
     path: 'admin-panel',
     loadChildren: () => import('./pages/admin-panel/admin-panel.module').then( m => m.AdminPanelPageModule)
   },
+  {
+    path: 'trash',
+    loadChildren: () => import('./pages/trash/trash.module').then( m => m.TrashPageModule)
+  },
 
 ];
 @NgModule({

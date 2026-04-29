@@ -1,31 +1,42 @@
 import { Component, OnInit } from '@angular/core';
-import Swal, { SweetAlertIcon } from 'sweetalert2';
-import { ModalTagComponent } from '../modal-tag/modal-tag.component';
 import { ModalController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
 import { Tag, TagService } from 'src/app/services/tag.service';
 import { TaskService, Task } from 'src/app/services/task.service';
+import Swal, { SweetAlertIcon } from 'sweetalert2';
+import { ModalTagComponent } from '../modal-tag/modal-tag.component';
 
 @Component({
-  selector: 'app-admin-panel',
-  templateUrl: './admin-panel.page.html',
-  styleUrls: ['./admin-panel.page.scss'],
+  selector: 'app-trash',
+  templateUrl: './trash.page.html',
+  styleUrls: ['./trash.page.scss'],
   standalone: false,
 })
-export class AdminPanelPage implements OnInit {
-  tasks: any[] = [];
+export class TrashPage implements OnInit {
+  tasks: Task[] = [];
   newTaskTitle: string = '';
   isAdmin: boolean = false;
   tags: Tag[] = [];
   filterStatus: number = -1;
   filterTag: any = 'All';
   uploadingTaskId: string | null = null;
+
   constructor(
     private taskService: TaskService,
     private authService: AuthService,
     private modalCtrl: ModalController,
     private tagService: TagService,
   ) {}
+
+  /* logout
+   * Cierra sesión
+   */
+  logout() {
+    this.tasks = [];
+    this.newTaskTitle = '';
+    this.isAdmin = false;
+    this.authService.logout();
+  }
 
   ngOnInit() {
     this.authService.isAdmin().subscribe((role) => {
@@ -36,8 +47,6 @@ export class AdminPanelPage implements OnInit {
   ionViewWillEnter = () => {
     this.loadTasks();
     this.loadTags();
-    this.filterTask('All');
-    this.loadTasks();
   };
 
   /* loadTags()
@@ -57,14 +66,16 @@ export class AdminPanelPage implements OnInit {
   filterTask(idTag: any) {
     this.filterTag = idTag;
     if (this.filterTag.detail.value == 'All') return this.loadTasks();
-    this.taskService.getAllTasks(this.filterStatus).subscribe((allTasks) => {
+    this.taskService.getTasks(this.filterStatus).subscribe((allTasks) => {
       this.tasks = [];
       allTasks.forEach((task) => {
-        task.idTags?.forEach((tag) => {
-          if (tag._id! == this.filterTag.detail.value) {
-            this.tasks.push(task);
-          }
-        });
+        if (task.trash) {
+          task.idTags?.forEach((tag) => {
+            if (tag._id! == this.filterTag.detail.value) {
+              this.tasks.push(task);
+            }
+          });
+        }
       });
     });
   }
@@ -73,9 +84,14 @@ export class AdminPanelPage implements OnInit {
    * Carga tareas de la DB filtrando en funcion del valor de "filterStatus", si es -1 carga todas.
    */
   loadTasks() {
-    this.taskService
-      .getAllTasks(this.filterStatus)
-      .subscribe((tasks) => (this.tasks = tasks));
+    this.tasks = [];
+    this.taskService.getTasks(this.filterStatus).subscribe((tasks) => {
+      tasks.forEach((task) => {
+        if (task.trash) {
+          this.tasks.push(task);
+        }
+      });
+    });
   }
 
   /* changeFilterStatus
@@ -84,7 +100,6 @@ export class AdminPanelPage implements OnInit {
    */
   changeFilterStatus(n: number) {
     this.filterStatus = n;
-    this.loadTasks();
     this.filterTask(this.filterTag);
   }
 
@@ -108,6 +123,7 @@ export class AdminPanelPage implements OnInit {
     this.taskService.updateTask(task._id!).subscribe((updatedTask) => {
       task.status = updatedTask.status;
     });
+    console.log(task);
   }
 
   /* deleteTask
@@ -116,6 +132,12 @@ export class AdminPanelPage implements OnInit {
    */
   deleteTask(task: Task) {
     this.taskService.deleteTask(task._id!).subscribe(() => {
+      this.tasks = this.tasks.filter((t) => t._id != task._id);
+    });
+  }
+
+  changeTrash(task: Task) {
+    this.taskService.trashUpdate(task._id!).subscribe(() => {
       this.tasks = this.tasks.filter((t) => t._id != task._id);
     });
   }
@@ -195,7 +217,7 @@ export class AdminPanelPage implements OnInit {
     const result = await Swal.fire({
       heightAuto: false,
       title: 'DELETE TASK',
-      text: 'You really want to delete the task?',
+      text: 'Do you really want to delete the task permanently?',
       icon: 'question',
       input: 'checkbox',
       inputPlaceholder: `Send mail to the task owner`,
@@ -217,7 +239,7 @@ export class AdminPanelPage implements OnInit {
     Swal.fire({
       heightAuto: false,
       title: 'DELETE TASK',
-      text: 'You really want to delete the task?',
+      text: 'Do you really want to delete the task permanently?',
       icon: 'question',
       confirmButtonText: 'Delete',
       showDenyButton: true,

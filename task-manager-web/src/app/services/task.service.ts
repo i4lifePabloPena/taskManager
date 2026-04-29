@@ -11,6 +11,7 @@ export interface Task {
   status: number;
   url?: string;
   idTags?: Tag[];
+  trash: boolean;
 }
 @Injectable({
   providedIn: 'root',
@@ -57,6 +58,16 @@ export class TaskService {
       `Bearer ${localStorage.getItem('token')}`,
     );
     return this.http.put<Task>(`${this.apiUrl}/${id}`, {}, { headers });
+  }
+
+  // trashUpdate
+  trashUpdate(id: string): Observable<Task> {
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${localStorage.getItem('token')}`,
+    );
+    let url = this.apiUrl + '/trash';
+    return this.http.put<Task>(`${url}/${id}`, {}, { headers });
   }
 
   // Subir archivo

@@ -13,9 +13,7 @@ const fs = require('fs');
 router.get('/tasks', authMiddleware, async (req, res) => {
     try {
         let query = { status: req.query.status };
-        if (true) { // req.userRole != 'admin'
             query.userId = req.userId;
-        }
         const tasks = await Task.find(query).populate('idTags');
         res.json(tasks);
     } catch (error) {
@@ -23,7 +21,7 @@ router.get('/tasks', authMiddleware, async (req, res) => {
     }
 });
 
-// Obtener las tareas requiere de un query con el estado de la tarea
+// Obtener todas las tareas
 router.get('/tasks/all', authMiddleware, async (req, res) => {
     try {
         let query = { status: req.query.status };
@@ -147,6 +145,24 @@ router.put('/tasks/:id', authMiddleware, async (req, res) => {
         res.json(task);
     } catch (error) {
         res.status(500).json({ error: 'Error al actualizar la tarea' });
+    }
+});
+
+// Marcar para eliminar
+router.put('/tasks/trash/:id', authMiddleware, async (req, res) =>{
+    try{
+        const { id } = req.params;
+        let query = { _id: id };
+        // if (req.userRole != 'admin') {
+        //     query.userId = req.userId;
+        // }
+        const task = await Task.findOne(query);
+        if (!task) return res.status(404).json({ error: "Tarea no encontrada" })
+        task.trash = (task.trash) ? false : true;
+        await task.save();
+        res.json(task)
+    } catch (error){
+        res.status(500).json({error: 'Error al actualizar la tarea'})
     }
 });
 
