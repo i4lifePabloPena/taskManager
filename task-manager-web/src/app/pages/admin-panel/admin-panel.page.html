@@ -1,56 +1,23 @@
-<!-- Header -->
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title slot="start">Tareas</ion-title>
     <ion-button
-    float="float"
-    color="warning"
+    color="dark"
     fill="clear"
-    [routerLink]="['/admin-panel']"
-    *ngIf="isAdmin"
-    >
-    <ion-title slot="end">
-      Admin
-      <ion-icon name="shield-checkmark" color="success"></ion-icon>
-    </ion-title>
-  </ion-button>
+    [routerLink]="['/home']"
+  ><ion-title><ion-icon name="shield-checkmark" color="success"></ion-icon>Admin Panel</ion-title></ion-button>
+
   <ion-button
-    color="danger"
-    fill="outline"
-    slot="end"
-    (click)="logout()"
-    size="small"
-  >Log Out</ion-button>
+  slot="end"
+  [routerLink]="['/home']"
+  >Go Back</ion-button>
   </ion-toolbar>
-
 </ion-header>
-
 
 <!-- Body -->
 <ion-content class="ion-padding">
-  <!-- addTasks -->
-  <div class="addTask">      
-    <ion-item>
-      <ion-input clear-input="true" [(ngModel)]="newTaskTitle" name="newTaskTitle" placeholder="New Task"></ion-input>
-      <ion-button
-        (click)="addTask()"
-      >ADD</ion-button>
-    </ion-item>
-  </div>
-
   <div class="container">
     <!-- Filters -->
     <div class="side">
-      <!-- Calendar -->
-        <ion-button
-        color="tertiary"
-        [routerLink]="['/calendar']"
-        ><ion-icon name="calendar-outline"></ion-icon>Calendar</ion-button>
-      <!-- Trash -->
-        <ion-button
-        color="danger"
-        [routerLink]="['/trash']"
-        ><ion-icon name="trash-outline"></ion-icon>Trash</ion-button>
       <!-- Status -->
       <ion-select
         #statusFilter
@@ -86,41 +53,23 @@
         <!-- Title -->
         <ion-card-header>
           <ion-toolbar class="test">
-            <ion-label [color]="colorTask(task)" slot="start">{{ task.title }}</ion-label>
-            <ion-chip outline="true" [color]="colorTask(task)">{{statusChip(task)}}</ion-chip>
-
-            <!-- Calendar -->
-            <ion-datetime-button
-              class=""
-              slot="end"
-              [datetime]="'datetime-' + task._id"
-            ></ion-datetime-button>
-
-            <ion-popover keepContentsMounted="true">
-              <ng-template>
-                <ion-datetime
-                  (ionChange)="dateUpdate(task, $event)"
-                  presentation="date"
-                  [id]="'datetime-' + task._id"
-                  showDefaultButtons="true"
-                  min="2026"
-                  max="2027"
-                  firstDayOfWeek="1"
-                >
-                </ion-datetime>
-              </ng-template>
-            </ion-popover>
-
-            <ion-chip outline="true" [color]="colorDate(task)" slot="end" disabled="true">{{task.limitDate | date:'dd/MM/yyyy'}}</ion-chip>
-            <!-- Calendar End -->
+            <ion-label [color]="colorTask(task)">{{ task.title }}  <ion-icon color="danger" *ngIf="task.trash" name="trash-bin-outline"></ion-icon></ion-label>
+            <ion-chip outline="true" [color]="colorTask(task)" slot="end">{{statusChip(task)}}</ion-chip>
           </ion-toolbar>
         </ion-card-header>
         <!-- Img -->
         <img *ngIf="task.url" [src]="task.url" alt="Tarea imagen">
-          <!-- Tags -->
+        <!-- Tags -->
         <ion-card-content>
           <ion-chip *ngFor="let tag of task.idTags" color="medium">{{ tag.nameTag }}</ion-chip>
         </ion-card-content>
+        <!-- Input de archivo (hide) -->
+        <input 
+        #fileInput
+        type="file" 
+        accept="image/*"
+        (change)="onFileSelected($event, task._id)"
+        />
         <!-- Buttons -->
         <ion-footer class="ion-no-border">
           <!-- Cambiar Estado -->
@@ -140,13 +89,35 @@
           ><ion-icon name="pricetag-outline"></ion-icon></ion-button>
           <!-- Delete Task Alert -->
           <ion-button
-            fill="solid"
-            color="danger"
-            (click)="deleteTaskAlert(task)"
-            size="small"
+          fill="solid"
+          color="danger"
+          (click)="deleteTaskAlert(task)"
+          size="small"
           ><ion-icon name="trash"></ion-icon></ion-button>
+          <!-- imgButtons -->
+          <!-- IMG Delete -->
+          <ion-button
+          class="delete-image-btn"
+          *ngIf="task.url"
+          (click)="fileDelete(task)"
+          fill="clear"
+          color="tertiary"
+          slot=""
+          ><ion-icon name="close-circle-outline"></ion-icon></ion-button>
+          <!-- Botón upload -->
+          <ion-button
+          class="uploadImageBtn" 
+          *ngIf="isAdmin"
+          color="tertiary" 
+          fill="solid" 
+          (click)="fileInput.click()"
+          [disabled]="uploadingTaskId == task._id"
+          size="small"
+          ><ion-icon name="image-outline"></ion-icon>
+          <span *ngIf="uploadingTaskId == task._id">Subiendo...</span></ion-button>
         </ion-footer>
       </ion-card>
     </div>
   </div>
 </ion-content>
+

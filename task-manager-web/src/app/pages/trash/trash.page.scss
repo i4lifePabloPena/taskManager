@@ -1,0 +1,246 @@
+// Header
+ion-header {
+  ion-toolbar {
+    padding: 8px;
+    
+    ion-title {
+      font-weight: 600;
+      font-size: 24px;
+      letter-spacing: -0.5px;
+    }
+  }
+}
+
+// Content container
+ion-content {
+  --padding-bottom: 24px;
+  --padding-top: 8px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+}
+
+// Tool Navigation (Input + Button)
+.addTask {
+  margin-bottom: 24px;
+  
+  ion-item {
+    --padding-start: 0;
+    --padding-end: 0;
+    --inner-padding-end: 8px;
+    border-radius: 12px;
+    margin-bottom: 0;
+    
+    ion-input {
+      --padding-start: 16px;
+      font-size: 16px;
+    }
+    
+    ion-button {
+      height: 40px;
+      min-width: 60px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-radius: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+      &:active {
+        transform: scale(0.5);
+      }
+    }
+  }
+}
+
+// Main container
+.container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: 240px 1fr;
+  }
+}
+
+/* Sidebar/left column - Filters */
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  
+  ion-select {
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --padding-top: 8px;
+    --padding-bottom: 8px;
+    border-radius: 8px;
+    font-weight: 500;
+    
+    &::part(label) {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+}
+
+/* Main column - Cards */
+.main {
+  display: grid;
+  gap: 20px;
+  
+  @media (max-width: 1000px) {
+    grid-template-columns: 1fr;
+  }
+  
+  @media (min-width: 1000px) and (max-width: 1524px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (min-width: 1524px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  ion-card {
+    margin: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 2px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    
+    &:hover {
+      box-shadow: 0 8px 24px;
+      transform: translateY(-4px);
+    }
+    
+    // Image
+    img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+    
+    // Card Header
+    ion-card-header {
+      padding: 16px;
+      border-bottom: 2px solid;
+      
+      ion-label {
+        font-weight: 600;
+        font-size: 18px;
+        line-height: 1.4;
+        word-break: break-word;
+        display: block;
+        
+        &[color="warning"] {
+          font-weight: 700;
+        }
+        
+        &[color="success"] {
+          font-weight: 700;
+        }
+      }
+    }
+    
+    // Card Content - Tags
+    ion-card-content {
+      padding: 12px 16px;
+      flex-grow: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-content: flex-start;
+      
+      ion-chip {
+        font-size: 12px;
+        font-weight: 500;
+        padding: 4px 10px;
+        height: auto;
+        border-radius: 20px;
+      }
+    }
+    
+    // Action Buttons
+    ion-button {
+      --padding-start: 8px;
+      --padding-end: 8px;
+      --padding-top: 6px;
+      --padding-bottom: 6px;
+      height: 40px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        transform: scale(1.05);
+      }
+      
+      &:active {
+        transform: scale(0.85);
+      }
+      
+      ion-icon {
+        margin-right: 4px;
+      }
+    }
+    
+    // Button Container
+    ion-footer {
+      padding: 12px 16px;
+      border-top: 1px solid;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      
+      ion-button {
+        margin: 0;
+      }
+    }
+  }
+}
+
+// Input file (hidden)
+input[type="file"] {
+  display: none !important;
+}
+
+// Responsive adjustments
+@media (max-width: 480px) {
+  ion-content {
+    --padding-start: 8px;
+    --padding-end: 8px;
+  }
+  
+  .container {
+    gap: 16px;
+  }
+  
+  .main {
+    gap: 16px;
+    grid-template-columns: 1fr;
+    
+    ion-card {
+      ion-card-header {
+        padding: 12px;
+      }
+      
+      ion-card-content {
+        padding: 8px 12px;
+      }
+      
+      img {
+        height: 160px;
+      }
+    }
+  }
+}
+
+.uploadImageBtn {
+  position: absolute;
+  right: 8px;
+
+}

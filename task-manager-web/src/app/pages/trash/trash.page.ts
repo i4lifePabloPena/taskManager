@@ -1,18 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { TaskService, Task } from '../../services/task.service';
-import { AuthService } from 'src/app/services/auth.service';
 import { ModalController } from '@ionic/angular';
-import { ModalTagComponent } from '../modal-tag/modal-tag.component';
-import { TagService, Tag } from '../../services/tag.service';
+import { AuthService } from 'src/app/services/auth.service';
+import { Tag, TagService } from 'src/app/services/tag.service';
+import { TaskService, Task } from 'src/app/services/task.service';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: 'home.page.html',
-  styleUrls: ['home.page.scss'],
+  selector: 'app-trash',
+  templateUrl: './trash.page.html',
+  styleUrls: ['./trash.page.scss'],
   standalone: false,
 })
-export class HomePage implements OnInit {
+export class TrashPage implements OnInit {
   tasks: Task[] = [];
   newTaskTitle: string = '';
   isAdmin: boolean = false;
@@ -24,7 +23,6 @@ export class HomePage implements OnInit {
   constructor(
     private taskService: TaskService,
     private authService: AuthService,
-    private modalCtrl: ModalController,
     private tagService: TagService,
   ) {}
 
@@ -66,10 +64,10 @@ export class HomePage implements OnInit {
   filterTask(idTag: any) {
     this.filterTag = idTag;
     if (this.filterTag.detail.value == 'All') return this.loadTasks();
-    this.taskService.getTasks(this.filterStatus).subscribe((allTasks) => {
+    this.taskService.getAllTasks(this.filterStatus).subscribe((allTasks) => {
       this.tasks = [];
       allTasks.forEach((task) => {
-        if (!task.trash) {
+        if (task.trash) {
           task.idTags?.forEach((tag) => {
             if (tag._id! == this.filterTag.detail.value) {
               this.tasks.push(task);
@@ -85,9 +83,9 @@ export class HomePage implements OnInit {
    */
   loadTasks() {
     this.tasks = [];
-    this.taskService.getTasks(this.filterStatus).subscribe((tasks) => {
+    this.taskService.getAllTasks(this.filterStatus).subscribe((tasks) => {
       tasks.forEach((task) => {
-        if (!task.trash) {
+        if (task.trash) {
           this.tasks.push(task);
         }
       });
@@ -103,59 +101,17 @@ export class HomePage implements OnInit {
     this.filterTask(this.filterTag);
   }
 
-  /* addTasks
-   * Añade una nueva tarea a la DB, la añade al array "tasks" y ejecuta addTaskAlert()
-   */
-  addTask() {
-    if (!this.newTaskTitle.trim()) return;
-    this.taskService.addTask(this.newTaskTitle).subscribe((task) => {
-      this.tasks.push(task);
-      this.newTaskTitle = '';
-      this.addTaskAlert();
-    });
-  }
-
-  /* toggleTask
-   * Cambia el estado de una tarea en la DB y luego actualiza el estado de la tarea
-   * Input: Task
-   */
-  toggleTask(task: Task) {
-    this.taskService.updateTask(task._id!).subscribe((updatedTask) => {
-      task.status = updatedTask.status;
-    });
-  }
-
-  // dateUpdate
-  dateUpdate(task: Task, dueDate: any) {
-    console.log(task);
-    console.log(dueDate);
-    const formattedDate = new Date(Date.parse(dueDate.detail.value));
-    console.log(formattedDate);
-
-    this.taskService
-      .dateUpdate(task._id!, formattedDate)
-      .subscribe((updatedTask) => {
-        task.limitDate = updatedTask.limitDate;
-      });
-  }
-
-  // colorDate
-  colorDate(task: Task) {
-    var color: string;
-    const today: Date = new Date();
-    const dueDate: Date = new Date(task.limitDate);
-    color =
-      dueDate.setHours(0, 0, 0, 0) >= today.setHours(0, 0, 0, 0)
-        ? 'success'
-        : 'danger';
-    return color;
-  }
-
   /* deleteTask
-   * marca una tarea para eliminar
+   * Borra una tarea de la DB
    * Input: Task
    */
   deleteTask(task: Task) {
+    this.taskService.deleteTask(task._id!).subscribe(() => {
+      this.tasks = this.tasks.filter((t) => t._id != task._id);
+    });
+  }
+
+  changeTrash(task: Task) {
     this.taskService.trashUpdate(task._id!).subscribe(() => {
       this.tasks = this.tasks.filter((t) => t._id != task._id);
     });
@@ -196,25 +152,6 @@ export class HomePage implements OnInit {
     }
     return textChip;
   }
-
-  /* openModal
-   * Abre un modal asociado a una tarea, en el cual se puede trabajar con las tags
-   * Input: Task
-   */
-  async openModal(task: Task) {
-    const modal = await this.modalCtrl.create({
-      component: ModalTagComponent,
-      componentProps: {
-        task,
-      },
-    });
-    await modal.present();
-    modal.onDidDismiss().then(() => {
-      this.loadTasks();
-      this.loadTags();
-    });
-  }
-
   // sweet alert 2
   addTaskAlert() {
     Swal.fire({
@@ -227,10 +164,38 @@ export class HomePage implements OnInit {
   }
 
   deleteTaskAlert(task: Task) {
+    this.isAdmin
+      ? this.deleteTaskAlertAdmin(task)
+      : this.deleteTaskAlertUser(task);
+  }
+
+  async deleteTaskAlertAdmin(task: Task) {
+    const result = await Swal.fire({
+      heightAuto: false,
+      title: 'DELETE TASK',
+      text: 'Do you really want to delete the task permanently?',
+      icon: 'question',
+      input: 'checkbox',
+      inputPlaceholder: `Send mail to the task owner`,
+      inputValue: 0,
+      confirmButtonText: 'Delete',
+      showDenyButton: true,
+      denyButtonText: 'Cancel',
+      theme: 'auto',
+    });
+    if (result.isConfirmed) {
+      this.deleteTask(task);
+      if (result.value) {
+        this.sendMail(task);
+      }
+    }
+  }
+
+  deleteTaskAlertUser(task: Task) {
     Swal.fire({
       heightAuto: false,
       title: 'DELETE TASK',
-      text: 'The task will be moved to the trash',
+      text: 'Do you really want to delete the task permanently?',
       icon: 'question',
       confirmButtonText: 'Delete',
       showDenyButton: true,

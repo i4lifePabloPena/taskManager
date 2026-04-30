@@ -13,11 +13,24 @@ const fs = require('fs');
 router.get('/tasks', authMiddleware, async (req, res) => {
     try {
         let query = { status: req.query.status };
-        if (req.userRole != 'admin') {
             query.userId = req.userId;
-        }
         const tasks = await Task.find(query).populate('idTags');
         res.json(tasks);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener tareas'});
+    }
+});
+
+// Obtener todas las tareas
+router.get('/tasks/all', authMiddleware, async (req, res) => {
+    try {
+        let query = { status: req.query.status };
+        if (req.userRole == 'admin') {
+            const tasks = await Task.find(query).populate('idTags');
+            res.json(tasks);
+        } else{
+            return res.status(401).json({ error: 'Acceso denegado' })
+        }
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener tareas'});
     }
@@ -108,8 +121,9 @@ router.delete("/tasks/img/:id", authMiddleware, async (req, res) => {
 router.post('/tasks',authMiddleware , async (req, res) => {
     try {
         const { title } = req.body;
+
         if (!title) return res.status(400).json({ error: "El título es obligatorio" });
-        const task = new Task({ title, status: 0, userId: req.userId});
+        const task = new Task({ title, status: 0, userId: req.userId, limitDate: new Date() });
         await task.save();
         res.status(201).json(task);
     } catch (error) {
@@ -132,6 +146,41 @@ router.put('/tasks/:id', authMiddleware, async (req, res) => {
         res.json(task);
     } catch (error) {
         res.status(500).json({ error: 'Error al actualizar la tarea' });
+    }
+});
+
+// Marcar para eliminar
+router.put('/tasks/trash/:id', authMiddleware, async (req, res) =>{
+    try{
+        const { id } = req.params;
+        let query = { _id: id };
+        if (req.userRole != 'admin') {
+            query.userId = req.userId;
+        }
+        const task = await Task.findOne(query);
+        if (!task) return res.status(404).json({ error: "Tarea no encontrada" })
+        task.trash = (task.trash) ? false : true;
+        await task.save();
+        res.json(task)
+    } catch (error){
+        res.status(500).json({error: 'Error al actualizar la tarea'})
+    }
+});
+
+// dateUpdate
+router.put('/tasks/limit-date/:id', authMiddleware, async (req, res) =>{
+    try{
+        const { id } =req.params;
+        let query = { _id: id };
+        if (req.userRole != 'admin') query.userId = req.userId;
+        const { limitDate } = req.body;
+        const task = await Task.findOne(query)
+        if (!task) return res.status(404).json({ error: 'Task not found'})
+        task.limitDate = limitDate;
+        await task.save();
+        res.json(task)
+    } catch (error){
+        res.status(500).json({error: 'Error al actualizar la tarea'})
     }
 });
 

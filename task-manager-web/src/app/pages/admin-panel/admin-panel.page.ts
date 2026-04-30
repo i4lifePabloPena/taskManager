@@ -1,42 +1,31 @@
 import { Component, OnInit } from '@angular/core';
-import { TaskService, Task } from '../../services/task.service';
-import { AuthService } from 'src/app/services/auth.service';
-import { ModalController } from '@ionic/angular';
-import { ModalTagComponent } from '../modal-tag/modal-tag.component';
-import { TagService, Tag } from '../../services/tag.service';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
+import { ModalTagComponent } from '../modal-tag/modal-tag.component';
+import { ModalController } from '@ionic/angular';
+import { AuthService } from 'src/app/services/auth.service';
+import { Tag, TagService } from 'src/app/services/tag.service';
+import { TaskService, Task } from 'src/app/services/task.service';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: 'home.page.html',
-  styleUrls: ['home.page.scss'],
+  selector: 'app-admin-panel',
+  templateUrl: './admin-panel.page.html',
+  styleUrls: ['./admin-panel.page.scss'],
   standalone: false,
 })
-export class HomePage implements OnInit {
-  tasks: Task[] = [];
+export class AdminPanelPage implements OnInit {
+  tasks: any[] = [];
   newTaskTitle: string = '';
   isAdmin: boolean = false;
   tags: Tag[] = [];
   filterStatus: number = -1;
   filterTag: any = 'All';
   uploadingTaskId: string | null = null;
-
   constructor(
     private taskService: TaskService,
     private authService: AuthService,
     private modalCtrl: ModalController,
     private tagService: TagService,
   ) {}
-
-  /* logout
-   * Cierra sesión
-   */
-  logout() {
-    this.tasks = [];
-    this.newTaskTitle = '';
-    this.isAdmin = false;
-    this.authService.logout();
-  }
 
   ngOnInit() {
     this.authService.isAdmin().subscribe((role) => {
@@ -47,6 +36,8 @@ export class HomePage implements OnInit {
   ionViewWillEnter = () => {
     this.loadTasks();
     this.loadTags();
+    this.filterTask('All');
+    this.loadTasks();
   };
 
   /* loadTags()
@@ -66,16 +57,14 @@ export class HomePage implements OnInit {
   filterTask(idTag: any) {
     this.filterTag = idTag;
     if (this.filterTag.detail.value == 'All') return this.loadTasks();
-    this.taskService.getTasks(this.filterStatus).subscribe((allTasks) => {
+    this.taskService.getAllTasks(this.filterStatus).subscribe((allTasks) => {
       this.tasks = [];
       allTasks.forEach((task) => {
-        if (!task.trash) {
-          task.idTags?.forEach((tag) => {
-            if (tag._id! == this.filterTag.detail.value) {
-              this.tasks.push(task);
-            }
-          });
-        }
+        task.idTags?.forEach((tag) => {
+          if (tag._id! == this.filterTag.detail.value) {
+            this.tasks.push(task);
+          }
+        });
       });
     });
   }
@@ -84,14 +73,9 @@ export class HomePage implements OnInit {
    * Carga tareas de la DB filtrando en funcion del valor de "filterStatus", si es -1 carga todas.
    */
   loadTasks() {
-    this.tasks = [];
-    this.taskService.getTasks(this.filterStatus).subscribe((tasks) => {
-      tasks.forEach((task) => {
-        if (!task.trash) {
-          this.tasks.push(task);
-        }
-      });
-    });
+    this.taskService
+      .getAllTasks(this.filterStatus)
+      .subscribe((tasks) => (this.tasks = tasks));
   }
 
   /* changeFilterStatus
@@ -100,6 +84,7 @@ export class HomePage implements OnInit {
    */
   changeFilterStatus(n: number) {
     this.filterStatus = n;
+    this.loadTasks();
     this.filterTask(this.filterTag);
   }
 
@@ -125,38 +110,12 @@ export class HomePage implements OnInit {
     });
   }
 
-  // dateUpdate
-  dateUpdate(task: Task, dueDate: any) {
-    console.log(task);
-    console.log(dueDate);
-    const formattedDate = new Date(Date.parse(dueDate.detail.value));
-    console.log(formattedDate);
-
-    this.taskService
-      .dateUpdate(task._id!, formattedDate)
-      .subscribe((updatedTask) => {
-        task.limitDate = updatedTask.limitDate;
-      });
-  }
-
-  // colorDate
-  colorDate(task: Task) {
-    var color: string;
-    const today: Date = new Date();
-    const dueDate: Date = new Date(task.limitDate);
-    color =
-      dueDate.setHours(0, 0, 0, 0) >= today.setHours(0, 0, 0, 0)
-        ? 'success'
-        : 'danger';
-    return color;
-  }
-
   /* deleteTask
-   * marca una tarea para eliminar
+   * Borra una tarea de la DB
    * Input: Task
    */
   deleteTask(task: Task) {
-    this.taskService.trashUpdate(task._id!).subscribe(() => {
+    this.taskService.deleteTask(task._id!).subscribe(() => {
       this.tasks = this.tasks.filter((t) => t._id != task._id);
     });
   }
@@ -227,10 +186,38 @@ export class HomePage implements OnInit {
   }
 
   deleteTaskAlert(task: Task) {
+    this.isAdmin
+      ? this.deleteTaskAlertAdmin(task)
+      : this.deleteTaskAlertUser(task);
+  }
+
+  async deleteTaskAlertAdmin(task: Task) {
+    const result = await Swal.fire({
+      heightAuto: false,
+      title: 'DELETE TASK',
+      text: 'You really want to delete the task?',
+      icon: 'question',
+      input: 'checkbox',
+      inputPlaceholder: `Send mail to the task owner`,
+      inputValue: 0,
+      confirmButtonText: 'Delete',
+      showDenyButton: true,
+      denyButtonText: 'Cancel',
+      theme: 'auto',
+    });
+    if (result.isConfirmed) {
+      this.deleteTask(task);
+      if (result.value) {
+        this.sendMail(task);
+      }
+    }
+  }
+
+  deleteTaskAlertUser(task: Task) {
     Swal.fire({
       heightAuto: false,
       title: 'DELETE TASK',
-      text: 'The task will be moved to the trash',
+      text: 'You really want to delete the task?',
       icon: 'question',
       confirmButtonText: 'Delete',
       showDenyButton: true,
@@ -274,6 +261,47 @@ export class HomePage implements OnInit {
           theme: 'auto',
         });
       },
+    });
+  }
+
+  /* IMG
+   */
+  onFileSelected(event: any, taskId: string) {
+    const file: File = event.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      this.persoAlert('Solo se permiten imágenes', 'danger', 'success');
+      return;
+    }
+    this.uploadingTaskId = taskId;
+    const task = this.tasks.find((t) => t._id === taskId);
+    if (task && task.url) {
+      this.taskService.deleteFile(taskId).subscribe(() => {
+        this.uploadNewFile(taskId, file);
+      });
+    } else {
+      this.uploadNewFile(taskId, file);
+    }
+  }
+  private uploadNewFile(taskId: string, file: File) {
+    this.taskService.uploadFile(taskId, file).subscribe((response) => {
+      const taskIndex = this.tasks.findIndex((t) => t._id === taskId);
+      if (taskIndex > -1) {
+        this.tasks[taskIndex] = response.task;
+      }
+      this.uploadingTaskId = null;
+      this.persoAlert('Imagen subida correctamente', 'success', 'success');
+      this.loadTasks();
+    });
+  }
+
+  // File Delete
+  async fileDelete(task: Task) {
+    this.taskService.deleteFile(task._id!).subscribe((updatedTask) => {
+      const taskIndex = this.tasks.findIndex((t) => t._id === task._id);
+      this.tasks[taskIndex] = updatedTask;
+      this.persoAlert('File deleted', 'success', 'success');
+      this.loadTasks();
     });
   }
 }

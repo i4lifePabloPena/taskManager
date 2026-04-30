@@ -1,0 +1,84 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-button
+    color="dark"
+    fill="clear"
+    [routerLink]="['/home']"
+  ><ion-title><ion-icon color="danger" name="trash-outline"></ion-icon> Trash</ion-title></ion-button>
+
+  <ion-button
+  slot="end"
+  [routerLink]="['/home']"
+  >Go Back</ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<!-- Body -->
+<ion-content class="ion-padding">
+  <div class="container">
+    <!-- Filters -->
+    <div class="side">
+      <!-- Status -->
+      <ion-select
+        #statusFilter
+        (ionChange)="changeFilterStatus(statusFilter.value)"
+        toggleIcon="funnel-outline"
+        label="Task Status"
+        interface="popover"
+        label-placement="floating"
+        fill="solid"
+      >
+        <ion-select-option value="-1">All</ion-select-option>
+        <ion-select-option value="0">Pendientes</ion-select-option>
+        <ion-select-option value="1">En Progreso</ion-select-option>
+        <ion-select-option value="2">Completadas</ion-select-option>
+      </ion-select>
+      <!-- Tags -->
+      <ion-select
+        toggleIcon="pricetags-outline"
+        label="Tags"
+        interface="popover"
+        label-placement="floating"
+        fill="solid"
+        (ionChange)="filterTask($event)"
+      >
+        <ion-select-option value="All">All</ion-select-option>
+        <ion-select-option value="{{tag._id}}" *ngFor="let tag of tags">{{tag.nameTag}}</ion-select-option>
+      </ion-select>
+    </div>
+
+    <!-- Cards -->
+    <div class="main">
+      <ion-card *ngFor="let task of tasks">
+        <!-- Title -->
+        <ion-card-header>
+          <ion-toolbar class="test">
+            <ion-label [color]="colorTask(task)">{{ task.title }}</ion-label>
+            <ion-chip outline="true" [color]="colorTask(task)" slot="end">{{statusChip(task)}}</ion-chip>
+          </ion-toolbar>
+        </ion-card-header>
+        <!-- Img -->
+        <img *ngIf="task.url" [src]="task.url" alt="Tarea imagen">
+          <!-- Tags -->
+        <ion-card-content>
+          <ion-chip *ngFor="let tag of task.idTags" color="medium">{{ tag.nameTag }}</ion-chip>
+        </ion-card-content>
+        <!-- Buttons -->
+        <ion-footer class="ion-no-border">
+          <!-- Delete Task Alert -->
+          <ion-button
+            fill="solid"
+            color="danger"
+            (click)="deleteTaskAlert(task)"
+            size="small"
+          ><ion-icon name="trash"></ion-icon></ion-button>
+          <ion-button
+            (click)="changeTrash(task)"
+            class="uploadImageBtn"
+            color="tertiary"
+          ><ion-icon name="magnet-outline"></ion-icon>Recuperar</ion-button>
+        </ion-footer>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

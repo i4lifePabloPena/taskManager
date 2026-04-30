@@ -11,6 +11,8 @@ export interface Task {
   status: number;
   url?: string;
   idTags?: Tag[];
+  trash: boolean;
+  limitDate: Date;
 }
 @Injectable({
   providedIn: 'root',
@@ -30,6 +32,17 @@ export class TaskService {
     return this.http.get<Task[]>(url, { headers });
   }
 
+  // Obtener todas las tareas
+  getAllTasks(status?: number): Observable<Task[]> {
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${localStorage.getItem('token')}`,
+    );
+    let url = this.apiUrl + '/all';
+    url += status != -1 ? `?status=${status}` : '?status=1&status=2&status=0';
+    return this.http.get<Task[]>(url, { headers });
+  }
+
   // Añadir tareas
   addTask(title: string): Observable<Task> {
     const headers = new HttpHeaders().set(
@@ -46,6 +59,26 @@ export class TaskService {
       `Bearer ${localStorage.getItem('token')}`,
     );
     return this.http.put<Task>(`${this.apiUrl}/${id}`, {}, { headers });
+  }
+
+  // trashUpdate
+  trashUpdate(id: string): Observable<Task> {
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${localStorage.getItem('token')}`,
+    );
+    let url = this.apiUrl + '/trash';
+    return this.http.put<Task>(`${url}/${id}`, {}, { headers });
+  }
+
+  // dateUpdate
+  dateUpdate(id: string, limitDate: Date): Observable<Task> {
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${localStorage.getItem('token')}`,
+    );
+    let url = this.apiUrl + '/limit-date';
+    return this.http.put<Task>(`${url}/${id}`, { limitDate }, { headers });
   }
 
   // Subir archivo
