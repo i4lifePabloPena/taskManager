@@ -5,7 +5,6 @@ import { ModalController } from '@ionic/angular';
 import { ModalTagComponent } from '../modal-tag/modal-tag.component';
 import { TagService, Tag } from '../../services/tag.service';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
-import { format, parseISO } from 'date-fns';
 
 @Component({
   selector: 'app-home',
@@ -81,22 +80,6 @@ export class HomePage implements OnInit {
     });
   }
 
-  // filterTask(eventIdTag: any) {
-  //   this.loadTasks(); // <------ Problema
-
-  //   if (eventIdTag.detail.value != 'All') {
-  //     const tempTask: Task[] = this.tasks;
-  //     this.tasks = [];
-  //     tempTask.forEach((task) => {
-  //       task.idTags?.forEach((tag) => {
-  //         if (tag._id == eventIdTag.detail.value) {
-  //           this.tasks.push(task);
-  //         }
-  //       });
-  //     });
-  //   }
-  // }
-
   /* loadTasks
    * Carga tareas de la DB filtrando en funcion del valor de "filterStatus", si es -1 carga todas.
    */
@@ -142,17 +125,30 @@ export class HomePage implements OnInit {
     });
   }
 
+  // dateUpdate
   dateUpdate(task: Task, dueDate: any) {
-    console.log(task._id);
+    console.log(task);
     console.log(dueDate);
-    const formattedDate = format(parseISO(dueDate), 'date');
+    const formattedDate = new Date(Date.parse(dueDate.detail.value));
     console.log(formattedDate);
 
     this.taskService
-      .dateUpdate(task._id!, limitDate)
+      .dateUpdate(task._id!, formattedDate)
       .subscribe((updatedTask) => {
-        task.status = updatedTask.status;
+        task.limitDate = updatedTask.limitDate;
       });
+  }
+
+  // colorDate
+  colorDate(task: Task) {
+    var color: string;
+    const today: Date = new Date();
+    const dueDate: Date = new Date(task.limitDate);
+    color =
+      dueDate.setHours(0, 0, 0, 0) >= today.setHours(0, 0, 0, 0)
+        ? 'success'
+        : 'danger';
+    return color;
   }
 
   /* deleteTask
@@ -278,47 +274,6 @@ export class HomePage implements OnInit {
           theme: 'auto',
         });
       },
-    });
-  }
-
-  /* IMG
-   */
-  onFileSelected(event: any, taskId: string) {
-    const file: File = event.target.files[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      this.persoAlert('Solo se permiten imágenes', 'danger', 'success');
-      return;
-    }
-    this.uploadingTaskId = taskId;
-    const task = this.tasks.find((t) => t._id === taskId);
-    if (task && task.url) {
-      this.taskService.deleteFile(taskId).subscribe(() => {
-        this.uploadNewFile(taskId, file);
-      });
-    } else {
-      this.uploadNewFile(taskId, file);
-    }
-  }
-  private uploadNewFile(taskId: string, file: File) {
-    this.taskService.uploadFile(taskId, file).subscribe((response) => {
-      const taskIndex = this.tasks.findIndex((t) => t._id === taskId);
-      if (taskIndex > -1) {
-        this.tasks[taskIndex] = response.task;
-      }
-      this.uploadingTaskId = null;
-      this.persoAlert('Imagen subida correctamente', 'success', 'success');
-      this.loadTasks();
-    });
-  }
-
-  // File Delete
-  async fileDelete(task: Task) {
-    this.taskService.deleteFile(task._id!).subscribe((updatedTask) => {
-      const taskIndex = this.tasks.findIndex((t) => t._id === task._id);
-      this.tasks[taskIndex] = updatedTask;
-      this.persoAlert('File deleted', 'success', 'success');
-      this.loadTasks();
     });
   }
 }

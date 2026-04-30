@@ -4,7 +4,6 @@ import { AuthService } from 'src/app/services/auth.service';
 import { Tag, TagService } from 'src/app/services/tag.service';
 import { TaskService, Task } from 'src/app/services/task.service';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
-import { ModalTagComponent } from '../modal-tag/modal-tag.component';
 
 @Component({
   selector: 'app-trash',
@@ -24,7 +23,6 @@ export class TrashPage implements OnInit {
   constructor(
     private taskService: TaskService,
     private authService: AuthService,
-    private modalCtrl: ModalController,
     private tagService: TagService,
   ) {}
 
@@ -103,29 +101,6 @@ export class TrashPage implements OnInit {
     this.filterTask(this.filterTag);
   }
 
-  /* addTasks
-   * Añade una nueva tarea a la DB, la añade al array "tasks" y ejecuta addTaskAlert()
-   */
-  addTask() {
-    if (!this.newTaskTitle.trim()) return;
-    this.taskService.addTask(this.newTaskTitle).subscribe((task) => {
-      this.tasks.push(task);
-      this.newTaskTitle = '';
-      this.addTaskAlert();
-    });
-  }
-
-  /* toggleTask
-   * Cambia el estado de una tarea en la DB y luego actualiza el estado de la tarea
-   * Input: Task
-   */
-  toggleTask(task: Task) {
-    this.taskService.updateTask(task._id!).subscribe((updatedTask) => {
-      task.status = updatedTask.status;
-    });
-    console.log(task);
-  }
-
   /* deleteTask
    * Borra una tarea de la DB
    * Input: Task
@@ -177,25 +152,6 @@ export class TrashPage implements OnInit {
     }
     return textChip;
   }
-
-  /* openModal
-   * Abre un modal asociado a una tarea, en el cual se puede trabajar con las tags
-   * Input: Task
-   */
-  async openModal(task: Task) {
-    const modal = await this.modalCtrl.create({
-      component: ModalTagComponent,
-      componentProps: {
-        task,
-      },
-    });
-    await modal.present();
-    modal.onDidDismiss().then(() => {
-      this.loadTasks();
-      this.loadTags();
-    });
-  }
-
   // sweet alert 2
   addTaskAlert() {
     Swal.fire({
@@ -283,47 +239,6 @@ export class TrashPage implements OnInit {
           theme: 'auto',
         });
       },
-    });
-  }
-
-  /* IMG
-   */
-  onFileSelected(event: any, taskId: string) {
-    const file: File = event.target.files[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      this.persoAlert('Solo se permiten imágenes', 'danger', 'success');
-      return;
-    }
-    this.uploadingTaskId = taskId;
-    const task = this.tasks.find((t) => t._id === taskId);
-    if (task && task.url) {
-      this.taskService.deleteFile(taskId).subscribe(() => {
-        this.uploadNewFile(taskId, file);
-      });
-    } else {
-      this.uploadNewFile(taskId, file);
-    }
-  }
-  private uploadNewFile(taskId: string, file: File) {
-    this.taskService.uploadFile(taskId, file).subscribe((response) => {
-      const taskIndex = this.tasks.findIndex((t) => t._id === taskId);
-      if (taskIndex > -1) {
-        this.tasks[taskIndex] = response.task;
-      }
-      this.uploadingTaskId = null;
-      this.persoAlert('Imagen subida correctamente', 'success', 'success');
-      this.loadTasks();
-    });
-  }
-
-  // File Delete
-  async fileDelete(task: Task) {
-    this.taskService.deleteFile(task._id!).subscribe((updatedTask) => {
-      const taskIndex = this.tasks.findIndex((t) => t._id === task._id);
-      this.tasks[taskIndex] = updatedTask;
-      this.persoAlert('File deleted', 'success', 'success');
-      this.loadTasks();
     });
   }
 }

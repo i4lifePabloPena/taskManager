@@ -15,16 +15,6 @@
 
 <!-- Body -->
 <ion-content class="ion-padding">
-  <!-- addTasks -->
-  <div class="addTask">      
-    <ion-item>
-      <ion-input clear-input="true" [(ngModel)]="newTaskTitle" name="newTaskTitle" placeholder="New Task"></ion-input>
-      <ion-button
-        (click)="addTask()"
-      >ADD</ion-button>
-    </ion-item>
-  </div>
-
   <div class="container">
     <!-- Filters -->
     <div class="side">
@@ -75,21 +65,6 @@
         </ion-card-content>
         <!-- Buttons -->
         <ion-footer class="ion-no-border">
-          <!-- Cambiar Estado -->
-          <ion-button
-          fill="solid"
-          color="primary"
-          (click)="toggleTask(task)"
-          size="small"
-          ><ion-icon name="play-skip-forward-outline"></ion-icon></ion-button>
-          <!-- Abrir Modal Tags -->
-          <ion-button
-          slot=""
-          fill="solid"
-          color="success"
-          (click)="openModal(task)"
-          size="small"
-          ><ion-icon name="pricetag-outline"></ion-icon></ion-button>
           <!-- Delete Task Alert -->
           <ion-button
             fill="solid"

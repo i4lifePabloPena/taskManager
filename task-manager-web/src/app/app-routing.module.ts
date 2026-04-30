@@ -26,6 +26,10 @@ const routes: Routes = [
     path: 'trash',
     loadChildren: () => import('./pages/trash/trash.module').then( m => m.TrashPageModule)
   },
+  {
+    path: 'calendar',
+    loadChildren: () => import('./pages/calendar/calendar.module').then( m => m.CalendarPageModule)
+  },
 
 ];
 @NgModule({

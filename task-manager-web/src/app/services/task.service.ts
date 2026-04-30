@@ -77,8 +77,8 @@ export class TaskService {
       'Authorization',
       `Bearer ${localStorage.getItem('token')}`,
     );
-    let url = this.apiUrl + '/date';
-    return this.http.post<Task>(`${url}/${id}`, { limitDate }, { headers });
+    let url = this.apiUrl + '/limit-date';
+    return this.http.put<Task>(`${url}/${id}`, { limitDate }, { headers });
   }
 
   // Subir archivo

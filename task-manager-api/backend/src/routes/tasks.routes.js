@@ -174,6 +174,7 @@ router.put('/tasks/limit-date/:id', authMiddleware, async (req, res) =>{
         let query = { _id: id };
         if (req.userRole != 'admin') query.userId = req.userId;
         const { limitDate } = req.body;
+        const task = await Task.findOne(query)
         if (!task) return res.status(404).json({ error: 'Task not found'})
         task.limitDate = limitDate;
         await task.save();

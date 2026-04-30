@@ -41,6 +41,12 @@
   <div class="container">
     <!-- Filters -->
     <div class="side">
+      <!-- Calendar -->
+        <ion-button
+        color="tertiary"
+        [routerLink]="['/calendar']"
+        ><ion-icon name="calendar-outline"></ion-icon>Calendar</ion-button>
+      <!-- Trash -->
         <ion-button
         color="danger"
         [routerLink]="['/trash']"
@@ -84,23 +90,29 @@
             <ion-chip outline="true" [color]="colorTask(task)">{{statusChip(task)}}</ion-chip>
 
             <!-- Calendar -->
-            <ion-datetime-button slot="end"  datetime="datetime"></ion-datetime-button>
-            
+            <ion-datetime-button
+              class=""
+              slot="end"
+              [datetime]="'datetime-' + task._id"
+            ></ion-datetime-button>
+
             <ion-popover keepContentsMounted="true">
-             <ng-template>
+              <ng-template>
                 <ion-datetime
-                  #dueDate
-                  (ionChange)="dateUpdate(task, dueDate.value)"
+                  (ionChange)="dateUpdate(task, $event)"
                   presentation="date"
-                  id="datetime"
+                  [id]="'datetime-' + task._id"
                   showDefaultButtons="true"
+                  min="2026"
+                  max="2027"
+                  firstDayOfWeek="1"
                 >
                 </ion-datetime>
-            </ng-template>              
+              </ng-template>
             </ion-popover>
 
-            <!-- (click)="dateUpdate(task, 01/01/2000)" -->
-            <ion-chip outline="true" color="dark" slot="end" disabled="true">{{task.limitDate}}</ion-chip>
+            <ion-chip outline="true" [color]="colorDate(task)" slot="end" disabled="true">{{task.limitDate | date:'dd/MM/yyyy'}}</ion-chip>
+            <!-- Calendar End -->
           </ion-toolbar>
         </ion-card-header>
         <!-- Img -->

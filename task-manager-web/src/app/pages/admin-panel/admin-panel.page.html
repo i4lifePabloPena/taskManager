@@ -53,7 +53,7 @@
         <!-- Title -->
         <ion-card-header>
           <ion-toolbar class="test">
-            <ion-label [color]="colorTask(task)">{{ task.title }}</ion-label>
+            <ion-label [color]="colorTask(task)">{{ task.title }}  <ion-icon color="danger" *ngIf="task.trash" name="trash-bin-outline"></ion-icon></ion-label>
             <ion-chip outline="true" [color]="colorTask(task)" slot="end">{{statusChip(task)}}</ion-chip>
           </ion-toolbar>
         </ion-card-header>
